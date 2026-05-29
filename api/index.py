@@ -9,12 +9,6 @@ from dotenv import load_dotenv
 
 # Load .env file if present
 load_dotenv()
-import hashlib
-import time
-from datetime import datetime
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import requests as http_requests
 
 app = Flask(__name__)
 CORS(app)
@@ -123,7 +117,7 @@ def load_menu():
     items = sb_get('menu_items', {'select': '*'})
     print(f"DEBUG: Loaded {len(cats)} categories and {len(items)} items from Supabase")
     menu = {}
-    # Build categories
+    # Build categories dictionary
     for cat in cats:
         c_id = cat['cat_id']
         menu[c_id] = {
@@ -135,7 +129,7 @@ def load_menu():
             "items": []
         }
     print(f"DEBUG: Constructed menu dict with {len(menu)} categories")
-    # Attach items to categories
+    # Attach items to appropriate categories
     for item in items:
         c_id = item.get('cat_id')
         if c_id in menu:
