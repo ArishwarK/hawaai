@@ -1,0 +1,15 @@
+{
+  "short_name": "HDelight",
+  "name": "Hawaii'n Delight",
+  "icons": [
+    {
+      "src": "logo.jpeg",
+      "sizes": "192x192 512x512",
+      "type": "image/jpeg"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#FF8FAB",
+  "background_color": "#ffffff"
+}
