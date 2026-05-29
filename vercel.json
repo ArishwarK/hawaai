@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "env": { "SUPABASE_URL": "https://ycgktkdudxazftgbizlw.supabase.co", "SUPABASE_KEY": "sb_publishable_MKn7eVJ-99gkPBkq5XYQ1w_wLaJ1T8J", "ADMIN_PASSWORD": "hawaai#2026" },
+  "env": { "SUPABASE_URL": "https://ycgktkdudxazftqbizlw.supabase.co", "SUPABASE_KEY": "sb_publishable_MKn7eVJ-99gkPBkq5XYQ1w_wLaJ1T8J", "ADMIN_PASSWORD": "hawaai#2026" },
   "builds": [
     {
       "src": "hawaiian-app/package.json",
