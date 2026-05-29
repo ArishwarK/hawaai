@@ -303,6 +303,31 @@ def handle_upload():
         print(f"Upload error: {e}")
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/debug', methods=['GET'])
+def debug_endpoint():
+    # Return environment variables and a quick menu fetch status
+    env_info = {
+        'SUPABASE_URL': os.getenv('SUPABASE_URL', ''),
+        'SUPABASE_KEY': os.getenv('SUPABASE_KEY', ''),
+        'ADMIN_PASSWORD': os.getenv('ADMIN_PASSWORD', '')
+    }
+    menu = load_menu()
+    # If menu contains error key, forward it
+    if isinstance(menu, dict) and 'error' in menu:
+        return jsonify({
+            'env': env_info,
+            'menu_error': menu['error']
+        })
+    # Count categories and items
+    cat_count = len(menu)
+    item_count = sum(len(v.get('items', [])) for v in menu.values())
+    return jsonify({
+        'env': env_info,
+        'categories': cat_count,
+        'items': item_count,
+        'menu_sample': list(menu.keys())[:3]
+    })
+
 
 @app.route('/api/health', methods=['GET'])
 def health():
@@ -313,4 +338,7 @@ def health():
     })
 
 if __name__ == '__main__':
-    app.run()
+    # Vercel provides the PORT env variable for the serverless function
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
+
