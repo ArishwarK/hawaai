@@ -44,7 +44,7 @@ export default function AdminPage() {
     setErrorDetails(null);
     try {
       const [menuRes, reelsRes] = await Promise.all([
-        fetch('/api/menu'),
+        fetch(`/api/menu?cb=${Date.now()}`),
         fetch('/api/reels')
       ]);
 

@@ -235,7 +235,7 @@ export function MenuProvider({ children }) {
 
   const fetchMenu = async () => {
     try {
-      const response = await fetch('/api/menu');
+      const response = await fetch(`/api/menu?cb=${Date.now()}`);
       if (response.ok) {
         const data = await response.json();
         setMenuCategories(Object.values(data));
