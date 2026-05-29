@@ -233,29 +233,36 @@ export function MenuProvider({ children }) {
   const [loadingMenu, setLoadingMenu] = useState(true);
   const [menuError, setMenuError] = useState(null);
 
-  useEffect(() => {
-    const fetchMenu = async () => {
-      try {
-        const response = await fetch('/api/menu');
-        if (response.ok) {
-          const data = await response.json();
-          setMenuCategories(Object.values(data));
-          setMenuError(null);
-        } else {
-          setMenuError(`Server returned an error (${response.status}: ${response.statusText}).`);
-        }
-      } catch (err) {
-        console.error("Failed to fetch menu", err);
-        setMenuError("Network error: Cannot reach the database. This usually means the PC Firewall is blocking your phone.");
-      } finally {
-        setLoadingMenu(false);
+  const fetchMenu = async () => {
+    try {
+      const response = await fetch('/api/menu');
+      if (response.ok) {
+        const data = await response.json();
+        setMenuCategories(Object.values(data));
+        setMenuError(null);
+      } else {
+        setMenuError(`Server returned an error (${response.status}: ${response.statusText}).`);
       }
-    };
+    } catch (err) {
+      console.error('Failed to fetch menu', err);
+      setMenuError('Network error: Cannot reach the database. This usually means the PC Firewall is blocking your phone.');
+    } finally {
+      setLoadingMenu(false);
+    }
+  };
+
+  useEffect(() => {
     fetchMenu();
   }, []);
 
+  // Expose refresh function
+  const refreshMenu = async () => {
+    setLoadingMenu(true);
+    await fetchMenu();
+  };
+
   return (
-    <MenuContext.Provider value={{ menuCategories, loadingMenu, menuError }}>
+    <MenuContext.Provider value={{ menuCategories, loadingMenu, menuError, refreshMenu }}>
       {children}
     </MenuContext.Provider>
   );

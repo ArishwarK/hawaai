@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../App';
+import { useAuth, useMenuContext } from '../App';
 
 
 export default function AdminPage() {
@@ -18,6 +18,8 @@ export default function AdminPage() {
   const [showEditItem, setShowEditItem] = useState(false);
   const [editingItemData, setEditingItemData] = useState(null); // { catId, index, name, price, desc }
   const { token, logout: authLogout } = useAuth();
+  const { refreshMenu } = useMenuContext();
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -90,6 +92,10 @@ export default function AdminPage() {
 
       if (menuRes.ok && reelsRes.ok) {
         setMessage({ type: 'success', text: 'All changes saved to database!' });
+        // Refetch the latest data to update UI
+        await fetchData();
+        await refreshMenu();
+
       } else {
         setMessage({ type: 'error', text: 'Failed to save changes.' });
       }
