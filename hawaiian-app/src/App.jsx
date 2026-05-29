@@ -202,7 +202,7 @@ function FloatingActions() {
 
   return (
     <div className="floating-actions" style={{ position: 'fixed', bottom: '24px', right: '24px', display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 100 }}>
-      <a href="https://wa.me/919043976267" className="float-btn" aria-label="Chat on WhatsApp" target="_blank" rel="noreferrer" style={{ width: '60px', height: '60px', borderRadius: '50%', background: '#25D366', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(37,211,102,0.4)', transition: 'transform 0.2s', textDecoration: 'none' }}>
+      <a href="https://wa.me/919442728028" className="float-btn" aria-label="Chat on WhatsApp" target="_blank" rel="noreferrer" style={{ width: '60px', height: '60px', borderRadius: '50%', background: '#25D366', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(37,211,102,0.4)', transition: 'transform 0.2s', textDecoration: 'none' }}>
         <span style={{ fontSize: '32px', marginBottom: '2px' }}>💬</span>
       </a>
     </div>

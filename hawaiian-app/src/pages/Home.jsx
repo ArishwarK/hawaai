@@ -660,7 +660,7 @@ export default function Home() {
 
             <div className="loc-btns flex gap-4" style={{ flexWrap: 'wrap' }}>
               <a href="https://maps.app.goo.gl/dTrLvj3d6qQVNSVe6" target="_blank" rel="noreferrer" className="primary-btn" style={{ padding: '12px 32px', background: 'white', color: 'var(--charcoal)', fontWeight: 700, display: 'inline-block' }}>Get Directions</a>
-              <a href="tel:+919043976267" className="secondary-btn" style={{ padding: '12px 32px', background: 'transparent', color: 'white', border: '1px solid white', fontWeight: 700, display: 'inline-block' }}>Call Now</a>
+              <a href="tel:+919442728028" className="secondary-btn" style={{ padding: '12px 32px', background: 'transparent', color: 'white', border: '1px solid white', fontWeight: 700, display: 'inline-block' }}>Call Now</a>
             </div>
           </div>
           <div className="loc-map" style={{ width: '100%', height: '400px', borderRadius: '24px', overflow: 'hidden', background: '#333' }}>
