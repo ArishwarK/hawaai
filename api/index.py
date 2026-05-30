@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 
 # Load .env file if present
 import os
+load_dotenv()
 
 
 app = Flask(__name__)

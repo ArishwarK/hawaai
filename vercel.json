@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "env": { "SUPABASE_URL": "https://ycgktkdudxazftqbizlw.supabase.co", "SUPABASE_KEY": "sb_publishable_MKn7eVJ-99gkPBkq5XYQ1w_wLaJ1T8J", "ADMIN_PASSWORD": "hawaai#2026" },
+  "env": { "SUPABASE_URL": "https://ycgktkdudxazftqbizlw.supabase.co", "SUPABASE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InljZ2t0a2R1ZHhhemZ0cWJpemx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxOTg0NDgsImV4cCI6MjA5Mjc3NDQ0OH0.rGqAHDDT9lIwckhMJwPaJHwRlXE4tsFlowNVXsrETls", "ADMIN_PASSWORD": "hawaai#2026" },
   "builds": [
     {
       "src": "hawaiian-app/package.json",
