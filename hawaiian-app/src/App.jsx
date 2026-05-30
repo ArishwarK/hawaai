@@ -9,6 +9,7 @@ import ReviewsPage from './pages/ReviewsPage';
 import LoginPage from './pages/LoginPage';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import AdminPage from './pages/AdminPage';
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
