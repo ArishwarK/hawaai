@@ -167,6 +167,8 @@ function Navbar() {
 
 
 function Footer() {
+  const { pathname } = useLocation();
+  const isAdmin = pathname.startsWith('/admin');
   return (
     <footer className="footer" style={{ background: 'var(--charcoal)', color: 'var(--white)', padding: '80px 0 24px', marginTop: '64px' }}>
       <div className="container grid-3" style={{ gap: '48px', marginBottom: '48px' }}>
@@ -184,9 +186,13 @@ function Footer() {
           <h4 style={{ fontSize: '1.25rem', marginBottom: '16px', fontWeight: 600 }}>Quick Links</h4>
           <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px', padding: 0 }}>
             <li><Link to="/" style={{ color: '#aaa', transition: 'color 0.2s' }}>Home</Link></li>
-            <li><Link to="/about" style={{ color: '#aaa', transition: 'color 0.2s' }}>About Us</Link></li>
+            {!isAdmin && (
+              <>
+                <li><Link to="/about" style={{ color: '#aaa', transition: 'color 0.2s' }}>About Us</Link></li>
+                <li><Link to="/contact" style={{ color: '#aaa', transition: 'color 0.2s' }}>Contact</Link></li>
+              </>
+            )}
             <li><Link to="/menu" style={{ color: '#aaa', transition: 'color 0.2s' }}>Our Menu</Link></li>
-            <li><Link to="/contact" style={{ color: '#aaa', transition: 'color 0.2s' }}>Contact</Link></li>
           </ul>
         </div>
       </div>
