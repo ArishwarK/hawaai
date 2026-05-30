@@ -7,7 +7,8 @@ import MenuListing from './pages/MenuListing';
 import CategoryMenu from './pages/CategoryMenu';
 import ReviewsPage from './pages/ReviewsPage';
 import LoginPage from './pages/LoginPage';
-import AdminPage from './pages/AdminPage';
+import About from './pages/About';
+import Contact from './pages/Contact';
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -92,16 +93,16 @@ function Navbar() {
           {/* Desktop Links */}
           <div className="desktop-links" style={{ display: 'flex', gap: '32px' }}>
             <Link to="/" style={desktopNavLinkStyle}>Home</Link>
-            <a href="/#about" style={desktopNavLinkStyle}>About Us</a>
+            <Link to="/about" style={desktopNavLinkStyle}>About Us</Link>
             <Link to="/menu" style={desktopNavLinkStyle}>Our Menu</Link>
             <Link to="/reviews" style={desktopNavLinkStyle}>Reviews</Link>
           </div>
 
-          <a href="/#visit" className="desktop-cta" style={{
+          <Link to="/contact" className="desktop-cta" style={{
             padding: '10px 24px', borderRadius: '99px', background: 'var(--tropical-pink)', color: 'white', fontWeight: 700, textDecoration: 'none'
           }}>
             Visit Location
-          </a>
+          </Link>
 
           {/* Hamburger Toggle */}
           <button className="hamburger" onClick={() => setIsMenuOpen(true)}>
@@ -142,7 +143,7 @@ function Navbar() {
               </div>
               <div className="drawer-body">
                 <Link to="/" onClick={toggleMenu} className="drawer-item">Home <ChevronRight size={18} opacity={0.5} /></Link>
-                <a href="/#about" onClick={toggleMenu} className="drawer-item">About Us <ChevronRight size={18} opacity={0.5} /></a>
+                <Link to="/about" onClick={toggleMenu} className="drawer-item">About Us <ChevronRight size={18} opacity={0.5} /></Link>
                 <Link to="/menu" onClick={toggleMenu} className="drawer-item">Our Menu <ChevronRight size={18} opacity={0.5} /></Link>
                 <Link to="/reviews" onClick={toggleMenu} className="drawer-item">Customer Reviews <ChevronRight size={18} opacity={0.5} /></Link>
                 
@@ -179,9 +180,9 @@ function Footer() {
           <h4 style={{ fontSize: '1.25rem', marginBottom: '16px', fontWeight: 600 }}>Quick Links</h4>
           <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px', padding: 0 }}>
             <li><Link to="/" style={{ color: '#aaa', transition: 'color 0.2s' }}>Home</Link></li>
-            <li><a href="/#about" style={{ color: '#aaa', transition: 'color 0.2s' }}>About Us</a></li>
+            <li><Link to="/about" style={{ color: '#aaa', transition: 'color 0.2s' }}>About Us</Link></li>
             <li><Link to="/menu" style={{ color: '#aaa', transition: 'color 0.2s' }}>Our Menu</Link></li>
-            <li><a href="/#visit" style={{ color: '#aaa', transition: 'color 0.2s' }}>Contact</a></li>
+            <li><Link to="/contact" style={{ color: '#aaa', transition: 'color 0.2s' }}>Contact</Link></li>
           </ul>
         </div>
       </div>
@@ -362,6 +363,8 @@ export default function App() {
             <Route path="/menu/:category" element={<CategoryMenu />} />
             <Route path="/reviews" element={<ReviewsPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/admin" element={
               <ProtectedRoute>
                 <AdminPage />
