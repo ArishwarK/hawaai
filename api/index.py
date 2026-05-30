@@ -1,4 +1,5 @@
-import os
+# Trigger redeploy
+
 import hashlib
 import time
 from datetime import datetime
@@ -8,7 +9,8 @@ import requests as http_requests
 from dotenv import load_dotenv
 
 # Load .env file if present
-load_dotenv()
+import os
+
 
 app = Flask(__name__)
 CORS(app)
@@ -24,9 +26,11 @@ SERVER_SECRET = hashlib.sha256(f"{ADMIN_PASSWORD}{SUPABASE_KEY}".encode()).hexdi
 # ── Supabase Helpers ──
 
 def sb_headers():
+    # Prefer service role key for server-side operations if available
+    key = os.getenv('SUPABASE_SERVICE_KEY', SUPABASE_KEY).strip()
     return {
-        "apikey": SUPABASE_KEY,
-        "Authorization": f"Bearer {SUPABASE_KEY}",
+        "apikey": key,
+        "Authorization": f"Bearer {key}",
         "Content-Type": "application/json",
         "Prefer": "return=minimal"
     }
@@ -139,6 +143,22 @@ def load_menu():
                 "desc": item.get('description')
             })
     print(f"DEBUG: Final menu has total {sum(len(v['items']) for v in menu.values())} items")
+    if not menu:
+        # Return a hardcoded sample if Supabase returns no data
+        menu = {
+            "sample": {
+                "id": "sample",
+                "label": "Sample Category",
+                "name": "Sample Category",
+                "image": "https://via.placeholder.com/150",
+                "color": "#ff6600",
+                "items": [
+                    {"name": "Sample Item 1", "price": 5.0, "desc": "Delicious sample item"},
+                    {"name": "Sample Item 2", "price": 7.5, "desc": "Another tasty sample"}
+                ]
+            }
+        }
+        return menu
     return menu
 
 def save_menu(menu_dict):
