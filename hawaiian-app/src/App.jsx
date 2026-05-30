@@ -7,14 +7,11 @@ import MenuListing from './pages/MenuListing';
 import CategoryMenu from './pages/CategoryMenu';
 import ReviewsPage from './pages/ReviewsPage';
 import LoginPage from './pages/LoginPage';
-import About from './pages/About';
-import Contact from './pages/Contact';
 import AdminPage from './pages/AdminPage';
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { pathname } = useLocation();
-  const isAdmin = pathname.startsWith('/admin');
+
   const navLinkStyle = {
     color: '#333', fontWeight: 600, fontSize: '1rem',
     textDecoration: 'none', letterSpacing: '0.3px',
@@ -95,17 +92,18 @@ function Navbar() {
           {/* Desktop Links */}
           <div className="desktop-links" style={{ display: 'flex', gap: '32px' }}>
             <Link to="/" style={desktopNavLinkStyle}>Home</Link>
-            {!isAdmin && <Link to="/about" style={desktopNavLinkStyle}>About Us</Link>}
+            <a href="/#about" style={desktopNavLinkStyle}>About Us</a>
             <Link to="/menu" style={desktopNavLinkStyle}>Our Menu</Link>
             <Link to="/reviews" style={desktopNavLinkStyle}>Reviews</Link>
           </div>
 
-          {/* Hamburger Toggle and CTA */}
-          {!isAdmin && (
-            <Link to="/contact" className="desktop-cta" style={{
-              padding: '10px 24px', borderRadius: '99px', background: 'var(--tropical-pink)', color: 'white', fontWeight: 700, textDecoration: 'none'
-            }}>Visit Location</Link>
-          )}
+          <a href="/#visit" className="desktop-cta" style={{
+            padding: '10px 24px', borderRadius: '99px', background: 'var(--tropical-pink)', color: 'white', fontWeight: 700, textDecoration: 'none'
+          }}>
+            Visit Location
+          </a>
+
+          {/* Hamburger Toggle */}
           <button className="hamburger" onClick={() => setIsMenuOpen(true)}>
             <span></span>
             <span style={{ margin: '6px 0' }}></span>
@@ -140,20 +138,17 @@ function Navbar() {
                 >
                   <X size={32} />
                 </button>
+
               </div>
               <div className="drawer-body">
-                {/* Drawer Links */}
                 <Link to="/" onClick={toggleMenu} className="drawer-item">Home <ChevronRight size={18} opacity={0.5} /></Link>
-                {!isAdmin && (
-                  <>
-                    <Link to="/about" onClick={toggleMenu} className="drawer-item">About Us <ChevronRight size={18} opacity={0.5} /></Link>
-                    <Link to="/contact" onClick={toggleMenu} className="drawer-item">Contact <ChevronRight size={18} opacity={0.5} /></Link>
-                  </>
-                )}
+                <a href="/#about" onClick={toggleMenu} className="drawer-item">About Us <ChevronRight size={18} opacity={0.5} /></a>
                 <Link to="/menu" onClick={toggleMenu} className="drawer-item">Our Menu <ChevronRight size={18} opacity={0.5} /></Link>
-
-                <a href="https://maps.app.goo.gl/dTrLvj3d6qQVNSVe6" target="_blank" rel="noreferrer" onClick={toggleMenu} className="primary-btn" style={{ marginTop: '40px', width: '100%', background: 'linear-gradient(to right, var(--tropical-pink), #FF8585)', border: 'none', textDecoration: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px', borderRadius: '8px', color: 'white' }}>Visit Our Location</a>
-            <Link to="/reviews" onClick={toggleMenu} className="drawer-item">Customer Reviews <ChevronRight size={18} opacity={0.5} /></Link>
+                <Link to="/reviews" onClick={toggleMenu} className="drawer-item">Customer Reviews <ChevronRight size={18} opacity={0.5} /></Link>
+                
+                <a href="https://maps.app.goo.gl/dTrLvj3d6qQVNSVe6" target="_blank" rel="noreferrer" onClick={toggleMenu} className="primary-btn" style={{ marginTop: '40px', width: '100%', background: 'linear-gradient(to right, var(--tropical-pink), #FF8585)', border: 'none' }}>
+                  Visit Our Location
+                </a>
               </div>
             </motion.div>
           </>
@@ -167,8 +162,6 @@ function Navbar() {
 
 
 function Footer() {
-  const { pathname } = useLocation();
-  const isAdmin = pathname.startsWith('/admin');
   return (
     <footer className="footer" style={{ background: 'var(--charcoal)', color: 'var(--white)', padding: '80px 0 24px', marginTop: '64px' }}>
       <div className="container grid-3" style={{ gap: '48px', marginBottom: '48px' }}>
@@ -186,13 +179,9 @@ function Footer() {
           <h4 style={{ fontSize: '1.25rem', marginBottom: '16px', fontWeight: 600 }}>Quick Links</h4>
           <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px', padding: 0 }}>
             <li><Link to="/" style={{ color: '#aaa', transition: 'color 0.2s' }}>Home</Link></li>
-            {!isAdmin && (
-              <>
-                <li><Link to="/about" style={{ color: '#aaa', transition: 'color 0.2s' }}>About Us</Link></li>
-                <li><Link to="/contact" style={{ color: '#aaa', transition: 'color 0.2s' }}>Contact</Link></li>
-              </>
-            )}
+            <li><a href="/#about" style={{ color: '#aaa', transition: 'color 0.2s' }}>About Us</a></li>
             <li><Link to="/menu" style={{ color: '#aaa', transition: 'color 0.2s' }}>Our Menu</Link></li>
+            <li><a href="/#visit" style={{ color: '#aaa', transition: 'color 0.2s' }}>Contact</a></li>
           </ul>
         </div>
       </div>
@@ -373,8 +362,6 @@ export default function App() {
             <Route path="/menu/:category" element={<CategoryMenu />} />
             <Route path="/reviews" element={<ReviewsPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
             <Route path="/admin" element={
               <ProtectedRoute>
                 <AdminPage />
