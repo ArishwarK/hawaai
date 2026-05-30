@@ -13,7 +13,8 @@ import AdminPage from './pages/AdminPage';
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const { pathname } = useLocation();
+  const isAdmin = pathname.startsWith('/admin');
   const navLinkStyle = {
     color: '#333', fontWeight: 600, fontSize: '1rem',
     textDecoration: 'none', letterSpacing: '0.3px',
@@ -94,18 +95,17 @@ function Navbar() {
           {/* Desktop Links */}
           <div className="desktop-links" style={{ display: 'flex', gap: '32px' }}>
             <Link to="/" style={desktopNavLinkStyle}>Home</Link>
-            <Link to="/about" style={desktopNavLinkStyle}>About Us</Link>
+            {!isAdmin && <Link to="/about" style={desktopNavLinkStyle}>About Us</Link>}
             <Link to="/menu" style={desktopNavLinkStyle}>Our Menu</Link>
             <Link to="/reviews" style={desktopNavLinkStyle}>Reviews</Link>
           </div>
 
-          <Link to="/contact" className="desktop-cta" style={{
-            padding: '10px 24px', borderRadius: '99px', background: 'var(--tropical-pink)', color: 'white', fontWeight: 700, textDecoration: 'none'
-          }}>
-            Visit Location
-          </Link>
-
-          {/* Hamburger Toggle */}
+          {/* Hamburger Toggle and CTA */}
+          {!isAdmin && (
+            <Link to="/contact" className="desktop-cta" style={{
+              padding: '10px 24px', borderRadius: '99px', background: 'var(--tropical-pink)', color: 'white', fontWeight: 700, textDecoration: 'none'
+            }}>Visit Location</Link>
+          )}
           <button className="hamburger" onClick={() => setIsMenuOpen(true)}>
             <span></span>
             <span style={{ margin: '6px 0' }}></span>
@@ -140,17 +140,20 @@ function Navbar() {
                 >
                   <X size={32} />
                 </button>
-
               </div>
               <div className="drawer-body">
+                {/* Drawer Links */}
                 <Link to="/" onClick={toggleMenu} className="drawer-item">Home <ChevronRight size={18} opacity={0.5} /></Link>
-                <Link to="/about" onClick={toggleMenu} className="drawer-item">About Us <ChevronRight size={18} opacity={0.5} /></Link>
+                {!isAdmin && (
+                  <>
+                    <Link to="/about" onClick={toggleMenu} className="drawer-item">About Us <ChevronRight size={18} opacity={0.5} /></Link>
+                    <Link to="/contact" onClick={toggleMenu} className="drawer-item">Contact <ChevronRight size={18} opacity={0.5} /></Link>
+                  </>
+                )}
                 <Link to="/menu" onClick={toggleMenu} className="drawer-item">Our Menu <ChevronRight size={18} opacity={0.5} /></Link>
-                <Link to="/reviews" onClick={toggleMenu} className="drawer-item">Customer Reviews <ChevronRight size={18} opacity={0.5} /></Link>
-                
-                <a href="https://maps.app.goo.gl/dTrLvj3d6qQVNSVe6" target="_blank" rel="noreferrer" onClick={toggleMenu} className="primary-btn" style={{ marginTop: '40px', width: '100%', background: 'linear-gradient(to right, var(--tropical-pink), #FF8585)', border: 'none' }}>
-                  Visit Our Location
-                </a>
+
+                <a href="https://maps.app.goo.gl/dTrLvj3d6qQVNSVe6" target="_blank" rel="noreferrer" onClick={toggleMenu} className="primary-btn" style={{ marginTop: '40px', width: '100%', background: 'linear-gradient(to right, var(--tropical-pink), #FF8585)', border: 'none', textDecoration: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px', borderRadius: '8px', color: 'white' }}>Visit Our Location</a>
+            <Link to="/reviews" onClick={toggleMenu} className="drawer-item">Customer Reviews <ChevronRight size={18} opacity={0.5} /></Link>
               </div>
             </motion.div>
           </>
