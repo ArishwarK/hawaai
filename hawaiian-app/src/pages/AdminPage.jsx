@@ -1,8 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence, Reorder } from 'framer-motion';
+import { motion, AnimatePresence, Reorder, useDragControls } from 'framer-motion';
 import { useAuth, useMenuContext } from '../App';
 
+const DraggableCategory = ({ catId, cat, setSelectedCategory, openEditCategory, deleteCategory }) => {
+  const controls = useDragControls();
+
+  return (
+    <Reorder.Item 
+      value={catId} 
+      style={{ position: 'relative' }} 
+      dragListener={false} 
+      dragControls={controls}
+    >
+      <div 
+        className="admin-card" 
+        style={{ marginBottom: 0, cursor: 'pointer', transition: 'box-shadow 0.2s', paddingBottom: '24px' }}
+        onClick={(e) => {
+          if (e.target.closest('button')) return;
+          setSelectedCategory(catId);
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.1)'}
+        onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.05)'}
+        title="Click to manage items"
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+          <div style={{ flex: 1 }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div 
+                  style={{ cursor: 'grab', fontSize: '1.5rem', padding: '0 8px', color: '#bbb', display: 'flex', alignItems: 'center', touchAction: 'none' }} 
+                  title="Drag to reorder" 
+                  onPointerDown={(e) => {
+                    e.stopPropagation();
+                    controls.start(e);
+                  }}
+                >
+                  ☰
+                </div>
+                <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: cat.color }}></div>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>{cat.label.replace(/^\d+\.\s*/, '')}</h2>
+                <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
+                  <button onClick={() => openEditCategory(catId)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.2rem', opacity: 0.5 }} onMouseEnter={(e) => e.target.style.opacity = 1} onMouseLeave={(e) => e.target.style.opacity = 0.5} title="Edit Category">✏️</button>
+                  <button onClick={() => deleteCategory(catId)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#ff4d4d', opacity: 0.5 }} onMouseEnter={(e) => e.target.style.opacity = 1} onMouseLeave={(e) => e.target.style.opacity = 0.5} title="Delete Category">🗑️</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Reorder.Item>
+  );
+};
 
 export default function AdminPage() {
   const [menu, setMenu] = useState(null);
@@ -421,40 +470,16 @@ export default function AdminPage() {
               }}
               style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '32px' }}
             >
-              {Object.keys(menu).map((catId) => {
-                const cat = menu[catId];
-                return (
-                  <Reorder.Item key={catId} value={catId} style={{ position: 'relative' }}>
-                    <div className="admin-card" style={{ marginBottom: 0 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', borderBottom: '1px solid #eee', paddingBottom: '16px', flexWrap: 'wrap', gap: '16px' }}>
-                        <div style={{ flex: 1 }}>
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                              <div 
-                                style={{ cursor: 'grab', fontSize: '1.5rem', padding: '0 8px', color: '#bbb', display: 'flex', alignItems: 'center' }} 
-                                title="Drag to reorder" 
-                                onMouseDown={(e) => e.target.style.cursor = 'grabbing'} 
-                                onMouseUp={(e) => e.target.style.cursor = 'grab'}
-                              >
-                                ☰
-                              </div>
-                              <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: cat.color }}></div>
-                              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>{cat.label}</h2>
-                              <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
-                                <button onClick={() => openEditCategory(catId)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.2rem', opacity: 0.5 }} onMouseEnter={(e) => e.target.style.opacity = 1} onMouseLeave={(e) => e.target.style.opacity = 0.5} title="Edit Category">✏️</button>
-                                <button onClick={() => deleteCategory(catId)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#ff4d4d', opacity: 0.5 }} onMouseEnter={(e) => e.target.style.opacity = 1} onMouseLeave={(e) => e.target.style.opacity = 0.5} title="Delete Category">🗑️</button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <button onClick={() => setSelectedCategory(catId)} style={{ padding: '10px 20px', borderRadius: '12px', border: 'none', background: 'var(--tropical-pink)', color: 'white', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', marginLeft: '24px' }}>
-                          Manage Items ({cat.items.length}) ➜
-                        </button>
-                      </div>
-                    </div>
-                  </Reorder.Item>
-                );
-              })}
+              {Object.keys(menu).map((catId) => (
+                <DraggableCategory 
+                  key={catId} 
+                  catId={catId} 
+                  cat={menu[catId]} 
+                  setSelectedCategory={setSelectedCategory} 
+                  openEditCategory={openEditCategory} 
+                  deleteCategory={deleteCategory} 
+                />
+              ))}
             </Reorder.Group>
           ) : (
             // Render just the selected category
@@ -465,7 +490,7 @@ export default function AdminPage() {
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                         <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: cat.color }}></div>
-                        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>{cat.label}</h2>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>{cat.label.replace(/^\d+\.\s*/, '')}</h2>
                       </div>
                     </div>
                   </div>
