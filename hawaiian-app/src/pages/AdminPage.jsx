@@ -62,6 +62,7 @@ export default function AdminPage() {
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [newCatData, setNewCatData] = useState({ name: '', image: '', color: '#FF6B6B' });
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   // New Modal States
   const [showEditCategory, setShowEditCategory] = useState(false);
   const [editingCategoryData, setEditingCategoryData] = useState(null);
@@ -248,6 +249,7 @@ export default function AdminPage() {
 
   const handleImageUpload = async (file) => {
     if (!file) return null;
+    setIsUploadingImage(true);
     const formData = new FormData();
     formData.append('file', file);
     try {
@@ -257,10 +259,15 @@ export default function AdminPage() {
         body: formData
       });
       const data = await res.json();
-      if (res.ok) return data.url;
+      if (res.ok) {
+        setIsUploadingImage(false);
+        return data.url;
+      }
+      setIsUploadingImage(false);
       alert("Upload error: " + data.error);
       return null;
     } catch (err) {
+      setIsUploadingImage(false);
       alert("Upload failed. Connect backend properly.");
       return null;
     }
@@ -540,15 +547,14 @@ export default function AdminPage() {
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, fontSize: '0.85rem', color: '#555' }}>Header Image URL</label>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <input value={newCatData.image} onChange={(e) => setNewCatData({ ...newCatData, image: e.target.value })} placeholder="https://unsplash.com/..." style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', border: '1px solid #ddd', fontSize: '1rem', minWidth: 0 }} />
-                      <label style={{ background: '#e3f2fd', color: '#1976d2', padding: '12px 16px', borderRadius: '12px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                        <span>📷 Upload</span>
-                        <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
-                          const span = e.target.previousSibling;
-                          span.innerText = "⏳ Uploading...";
-                          handleImageUpload(e.target.files[0]).then(url => {
-                            if(url) setNewCatData({ ...newCatData, image: url });
-                            span.innerText = "📷 Upload";
-                          });
+                      <label style={{ background: isUploadingImage ? '#f5f5f5' : '#e3f2fd', color: isUploadingImage ? '#888' : '#1976d2', padding: '12px 16px', borderRadius: '12px', cursor: isUploadingImage ? 'not-allowed' : 'pointer', fontSize: '0.9rem', fontWeight: 700, whiteSpace: 'nowrap', opacity: isUploadingImage ? 0.7 : 1 }}>
+                        <span>{isUploadingImage ? "⏳ Uploading..." : "📷 Upload"}</span>
+                        <input type="file" accept="image/*" disabled={isUploadingImage} style={{ display: 'none' }} onChange={(e) => {
+                          if (e.target.files[0]) {
+                            handleImageUpload(e.target.files[0]).then(url => {
+                              if(url) setNewCatData({ ...newCatData, image: url });
+                            });
+                          }
                         }} />
                       </label>
                     </div>
@@ -584,15 +590,14 @@ export default function AdminPage() {
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600, fontSize: '0.85rem', color: '#555' }}>Header Image URL</label>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <input value={editingCategoryData.image || ''} onChange={(e) => setEditingCategoryData({ ...editingCategoryData, image: e.target.value })} style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', border: '1px solid #ddd', fontSize: '1rem', minWidth: 0 }} />
-                      <label style={{ background: '#e3f2fd', color: '#1976d2', padding: '12px 16px', borderRadius: '12px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                        <span>📷 Upload</span>
-                        <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => {
-                          const span = e.target.previousSibling;
-                          span.innerText = "⏳ Uploading...";
-                          handleImageUpload(e.target.files[0]).then(url => {
-                            if(url) setEditingCategoryData({ ...editingCategoryData, image: url });
-                            span.innerText = "📷 Upload";
-                          });
+                      <label style={{ background: isUploadingImage ? '#f5f5f5' : '#e3f2fd', color: isUploadingImage ? '#888' : '#1976d2', padding: '12px 16px', borderRadius: '12px', cursor: isUploadingImage ? 'not-allowed' : 'pointer', fontSize: '0.9rem', fontWeight: 700, whiteSpace: 'nowrap', opacity: isUploadingImage ? 0.7 : 1 }}>
+                        <span>{isUploadingImage ? "⏳ Uploading..." : "📷 Upload"}</span>
+                        <input type="file" accept="image/*" disabled={isUploadingImage} style={{ display: 'none' }} onChange={(e) => {
+                          if (e.target.files[0]) {
+                            handleImageUpload(e.target.files[0]).then(url => {
+                              if(url) setEditingCategoryData({ ...editingCategoryData, image: url });
+                            });
+                          }
                         }} />
                       </label>
                     </div>
