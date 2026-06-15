@@ -564,7 +564,7 @@ export default function AdminPage() {
                     <input type="color" value={newCatData.color} onChange={(e) => setNewCatData({ ...newCatData, color: e.target.value })} style={{ width: '64px', height: '48px', border: 'none', borderRadius: '12px', cursor: 'pointer', padding: 0 }} />
                   </div>
                   <div style={{ display: 'flex', gap: '16px', marginTop: '12px' }}>
-                    <button onClick={addCategory} style={{ flex: 1, padding: '14px', borderRadius: '14px', border: 'none', background: 'var(--tropical-pink)', color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(255,143,171,0.3)' }}>Create Category</button>
+                    <button disabled={isUploadingImage} onClick={addCategory} style={{ flex: 1, padding: '14px', borderRadius: '14px', border: 'none', background: isUploadingImage ? '#ccc' : 'var(--tropical-pink)', color: 'white', fontWeight: 700, cursor: isUploadingImage ? 'not-allowed' : 'pointer', boxShadow: isUploadingImage ? 'none' : '0 4px 12px rgba(255,143,171,0.3)' }}>Create Category</button>
                     <button onClick={() => setShowAddCategory(false)} style={{ flex: 1, padding: '14px', borderRadius: '14px', border: '1px solid #ddd', background: 'white', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
                   </div>
                 </div>
@@ -607,7 +607,7 @@ export default function AdminPage() {
                     <input type="color" value={editingCategoryData.color} onChange={(e) => setEditingCategoryData({ ...editingCategoryData, color: e.target.value })} style={{ width: '64px', height: '48px', border: 'none', borderRadius: '12px', cursor: 'pointer', padding: 0 }} />
                   </div>
                   <div style={{ display: 'flex', gap: '16px', marginTop: '12px' }}>
-                    <button onClick={saveCategoryEdit} style={{ flex: 1, padding: '14px', borderRadius: '14px', border: 'none', background: 'var(--tropical-pink)', color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(255,143,171,0.3)' }}>Save Changes</button>
+                    <button disabled={isUploadingImage} onClick={saveCategoryEdit} style={{ flex: 1, padding: '14px', borderRadius: '14px', border: 'none', background: isUploadingImage ? '#ccc' : 'var(--tropical-pink)', color: 'white', fontWeight: 700, cursor: isUploadingImage ? 'not-allowed' : 'pointer', boxShadow: isUploadingImage ? 'none' : '0 4px 12px rgba(255,143,171,0.3)' }}>Save Changes</button>
                     <button onClick={() => setShowEditCategory(false)} style={{ flex: 1, padding: '14px', borderRadius: '14px', border: '1px solid #ddd', background: 'white', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
                   </div>
                 </div>
