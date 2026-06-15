@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { useAuth, useMenuContext } from '../App';
 
 
@@ -11,6 +11,7 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
   const [showAddCategory, setShowAddCategory] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [newCatData, setNewCatData] = useState({ name: '', image: '', color: '#FF6B6B' });
   // New Modal States
   const [showEditCategory, setShowEditCategory] = useState(false);
@@ -186,26 +187,6 @@ export default function AdminPage() {
     openEditItem(catId, newIdx);
   };
 
-  const moveCategoryUp = (catId) => {
-    const keys = Object.keys(menu);
-    const idx = keys.indexOf(catId);
-    if (idx <= 0) return;
-    [keys[idx - 1], keys[idx]] = [keys[idx], keys[idx - 1]];
-    const reordered = {};
-    keys.forEach(k => { reordered[k] = menu[k]; });
-    setMenu(reordered);
-  };
-
-  const moveCategoryDown = (catId) => {
-    const keys = Object.keys(menu);
-    const idx = keys.indexOf(catId);
-    if (idx >= keys.length - 1) return;
-    [keys[idx], keys[idx + 1]] = [keys[idx + 1], keys[idx]];
-    const reordered = {};
-    keys.forEach(k => { reordered[k] = menu[k]; });
-    setMenu(reordered);
-  };
-
   const addReel = () => {
     setReels([...reels, ""]);
   };
@@ -270,9 +251,6 @@ export default function AdminPage() {
           .reels-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
           .menu-item-row { display: grid; grid-template-columns: 1fr 100px 1.5fr auto; gap: 20px; align-items: center; padding: 20px; border-radius: 20px; border: 1px solid #efefef; margin-bottom: 16px; background: #fff; transition: transform 0.1s; }
           .menu-item-row:active { transform: scale(0.99); }
-          .reorder-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid #e0e0e0; background: #f8f9fa; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: all 0.2s; color: #555; }
-          .reorder-btn:hover { background: #e3f2fd; border-color: #90caf9; color: #1976d2; transform: scale(1.1); }
-          .reorder-btn:disabled { opacity: 0.25; cursor: not-allowed; transform: none; background: #f8f9fa; border-color: #e0e0e0; color: #ccc; }
           
           input { height: 44px; padding: 0 16px; border-radius: 12px; }
 
@@ -334,12 +312,14 @@ export default function AdminPage() {
 
           </div>
           <div className="admin-header-actions">
-            <button 
-              onClick={() => setShowAddCategory(true)}
-              style={{ padding: '12px 20px', borderRadius: '12px', border: 'none', background: '#00C9E8', color: 'var(--charcoal)', fontWeight: 700, cursor: 'pointer' }}
-            >
-              + Category
-            </button>
+            {!selectedCategory && (
+              <button 
+                onClick={() => setShowAddCategory(true)}
+                style={{ padding: '12px 20px', borderRadius: '12px', border: 'none', background: '#00C9E8', color: 'var(--charcoal)', fontWeight: 700, cursor: 'pointer' }}
+              >
+                + Category
+              </button>
+            )}
             <button 
               onClick={handleSave} 
               disabled={saving}
@@ -359,164 +339,160 @@ export default function AdminPage() {
 
 
 
-        <div className="admin-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h2 style={{ fontSize: '1.3rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
-              🎬 Instagram Reels
-            </h2>
-            <button 
-              onClick={addReel}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '10px',
-                border: 'none',
-                background: '#e3f2fd',
-                color: '#1976d2',
-                fontWeight: 700,
-                fontSize: '0.8rem',
-                cursor: 'pointer'
-              }}
-            >
-              + Add Reel
-            </button>
-          </div>
-          <div className="reels-grid">
-            {reels.map((id, idx) => (
-              <div key={idx} style={{ position: 'relative' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>Reel {idx + 1}</label>
-                  <button 
-                    onClick={() => deleteReel(idx)}
-                    style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1rem', color: '#ff4d4d', opacity: 0.6 }}
-                    onMouseEnter={(e) => e.target.style.opacity = 1}
-                    onMouseLeave={(e) => e.target.style.opacity = 0.6}
-                  >
-                    🗑️
-                  </button>
+        {/* Reels Editor */}
+        {!selectedCategory && (
+          <div className="admin-card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h2 style={{ fontSize: '1.3rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                🎬 Instagram Reels
+              </h2>
+              <button 
+                onClick={addReel}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: '#e3f2fd',
+                  color: '#1976d2',
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
+                  cursor: 'pointer'
+                }}
+              >
+                + Add Reel
+              </button>
+            </div>
+            <div className="reels-grid">
+              {reels.map((id, idx) => (
+                <div key={idx} style={{ position: 'relative' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>Reel {idx + 1}</label>
+                    <button 
+                      onClick={() => deleteReel(idx)}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1rem', color: '#ff4d4d', opacity: 0.6 }}
+                      onMouseEnter={(e) => e.target.style.opacity = 1}
+                      onMouseLeave={(e) => e.target.style.opacity = 0.6}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                  <input 
+                    value={id}
+                    onChange={(e) => {
+                      const newReels = [...reels];
+                      newReels[idx] = e.target.value;
+                      setReels(newReels);
+                    }}
+                    placeholder="Enter Reel ID (e.g. C1a2b3c4d5e)"
+                    style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #eee', fontSize: '0.9rem', outline: 'none', background: '#fcfcfc' }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--tropical-pink)'}
+                    onBlur={(e) => e.target.style.borderColor = '#eee'}
+                  />
                 </div>
-                <input 
-                  value={id}
-                  onChange={(e) => {
-                    const newReels = [...reels];
-                    newReels[idx] = e.target.value;
-                    setReels(newReels);
-                  }}
-                  placeholder="Enter Reel ID (e.g. C1a2b3c4d5e)"
-                  style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #eee', fontSize: '0.9rem', outline: 'none', background: '#fcfcfc' }}
-                  onFocus={(e) => e.target.style.borderColor = 'var(--tropical-pink)'}
-                  onBlur={(e) => e.target.style.borderColor = '#eee'}
-                />
-              </div>
-            ))}
-            {reels.length === 0 && (
-              <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#aaa', padding: '20px', margin: 0 }}>No reels added yet. Click "+ Add Reel" to begin.</p>
-            )}
+              ))}
+              {reels.length === 0 && (
+                <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#aaa', padding: '20px', margin: 0 }}>No reels added yet. Click "+ Add Reel" to begin.</p>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Menu Editor */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          {Object.entries(menu).map(([catId, cat]) => (
-            <div key={catId} className="admin-card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', borderBottom: '1px solid #eee', paddingBottom: '16px', flexWrap: 'wrap', gap: '16px' }}>
+          {selectedCategory && (
+            <div style={{ marginBottom: '-16px' }}>
+              <button 
+                onClick={() => setSelectedCategory(null)}
+                style={{ padding: '10px 20px', borderRadius: '12px', border: '1px solid #ddd', background: 'white', color: '#333', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                ⬅ Back to Categories
+              </button>
+            </div>
+          )}
 
-                <div style={{ flex: 1 }}>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <button
-                          className="reorder-btn"
-                          onClick={() => moveCategoryUp(catId)}
-                          disabled={Object.keys(menu).indexOf(catId) === 0}
-                          title="Move Up"
-                        >
-                          ▲
-                        </button>
-                        <button
-                          className="reorder-btn"
-                          onClick={() => moveCategoryDown(catId)}
-                          disabled={Object.keys(menu).indexOf(catId) === Object.keys(menu).length - 1}
-                          title="Move Down"
-                        >
-                          ▼
+          {!selectedCategory ? (
+            <Reorder.Group 
+              axis="y" 
+              values={Object.keys(menu)} 
+              onReorder={(newOrder) => {
+                const reordered = {};
+                newOrder.forEach(k => { reordered[k] = menu[k]; });
+                setMenu(reordered);
+              }}
+              style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '32px' }}
+            >
+              {Object.keys(menu).map((catId) => {
+                const cat = menu[catId];
+                return (
+                  <Reorder.Item key={catId} value={catId} style={{ position: 'relative' }}>
+                    <div className="admin-card" style={{ marginBottom: 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', borderBottom: '1px solid #eee', paddingBottom: '16px', flexWrap: 'wrap', gap: '16px' }}>
+                        <div style={{ flex: 1 }}>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                              <div 
+                                style={{ cursor: 'grab', fontSize: '1.5rem', padding: '0 8px', color: '#bbb', display: 'flex', alignItems: 'center' }} 
+                                title="Drag to reorder" 
+                                onMouseDown={(e) => e.target.style.cursor = 'grabbing'} 
+                                onMouseUp={(e) => e.target.style.cursor = 'grab'}
+                              >
+                                ☰
+                              </div>
+                              <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: cat.color }}></div>
+                              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>{cat.label}</h2>
+                              <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
+                                <button onClick={() => openEditCategory(catId)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.2rem', opacity: 0.5 }} onMouseEnter={(e) => e.target.style.opacity = 1} onMouseLeave={(e) => e.target.style.opacity = 0.5} title="Edit Category">✏️</button>
+                                <button onClick={() => deleteCategory(catId)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#ff4d4d', opacity: 0.5 }} onMouseEnter={(e) => e.target.style.opacity = 1} onMouseLeave={(e) => e.target.style.opacity = 0.5} title="Delete Category">🗑️</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <button onClick={() => setSelectedCategory(catId)} style={{ padding: '10px 20px', borderRadius: '12px', border: 'none', background: 'var(--tropical-pink)', color: 'white', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', marginLeft: '24px' }}>
+                          Manage Items ({cat.items.length}) ➜
                         </button>
                       </div>
-                      <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: cat.color }}></div>
-                      <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>{cat.label}</h2>
-                      <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
-                        <button 
-                          onClick={() => openEditCategory(catId)}
-                          style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.2rem', opacity: 0.5 }}
-                          onMouseEnter={(e) => e.target.style.opacity = 1}
-                          onMouseLeave={(e) => e.target.style.opacity = 0.5}
-                          title="Edit Category"
-                        >
-                          ✏️
-                        </button>
-                        <button 
-                          onClick={() => deleteCategory(catId)}
-                          style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#ff4d4d', opacity: 0.5 }}
-                          onMouseEnter={(e) => e.target.style.opacity = 1}
-                          onMouseLeave={(e) => e.target.style.opacity = 0.5}
-                          title="Delete Category"
-                        >
-                          🗑️
-                        </button>
+                    </div>
+                  </Reorder.Item>
+                );
+              })}
+            </Reorder.Group>
+          ) : (
+            // Render just the selected category
+            Object.entries(menu).filter(([catId]) => catId === selectedCategory).map(([catId, cat]) => (
+              <div key={catId} className="admin-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', borderBottom: '1px solid #eee', paddingBottom: '16px', flexWrap: 'wrap', gap: '16px' }}>
+                  <div style={{ flex: 1 }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                        <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: cat.color }}></div>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>{cat.label}</h2>
                       </div>
                     </div>
                   </div>
+                  <button onClick={() => addItem(catId)} style={{ padding: '10px 20px', borderRadius: '12px', border: 'none', background: '#e3f2fd', color: '#1976d2', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', marginLeft: '24px' }}>
+                    + Add Item
+                  </button>
                 </div>
-                <button 
-                  onClick={() => addItem(catId)}
-                  style={{
-                    padding: '10px 20px',
-                    borderRadius: '12px',
-                    border: 'none',
-                    background: '#e3f2fd',
-                    color: '#1976d2',
-                    fontWeight: 700,
-                    fontSize: '0.85rem',
-                    cursor: 'pointer',
-                    marginLeft: '24px'
-                  }}
-                >
-                  + Add Item
-                </button>
-              </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {cat.items.map((item, idx) => {
-                  return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {cat.items.map((item, idx) => (
                     <div key={idx} className="menu-item-row">
-
-                        <>
-                          <div style={{ fontWeight: 600, fontSize: '1rem' }}>{item.name}</div>
-                          <div style={{ color: 'var(--tropical-pink)', fontWeight: 700 }}>{item.price}</div>
-                          <div style={{ color: '#666', fontSize: '0.9rem' }}>{item.desc}</div>
-                          <div style={{ display: 'flex', gap: '8px' }}>
-                            <button 
-                              onClick={() => openEditItem(catId, idx)}
-                              style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.2rem' }}
-                              title="Edit Item"
-                            >
-                              ✏️
-                            </button>
-                            <button 
-                              onClick={() => deleteItem(catId, idx)}
-                              style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ff4d4d', fontSize: '1.2rem' }}
-                              title="Delete Item"
-                            >
-                              🗑️
-                            </button>
-                          </div>
-                        </>
+                      <>
+                        <div style={{ fontWeight: 600, fontSize: '1rem' }}>{item.name}</div>
+                        <div style={{ color: 'var(--tropical-pink)', fontWeight: 700 }}>{item.price}</div>
+                        <div style={{ color: '#666', fontSize: '0.9rem' }}>{item.desc}</div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button onClick={() => openEditItem(catId, idx)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.2rem' }} title="Edit Item">✏️</button>
+                          <button onClick={() => deleteItem(catId, idx)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ff4d4d', fontSize: '1.2rem' }} title="Delete Item">🗑️</button>
+                        </div>
+                      </>
                     </div>
-                  );
-                })}
-                {cat.items.length === 0 && <p style={{ textAlign: 'center', color: '#aaa', fontSize: '0.9rem', padding: '20px' }}>No items in this category yet.</p>}
+                  ))}
+                  {cat.items.length === 0 && <p style={{ textAlign: 'center', color: '#aaa', fontSize: '0.9rem', padding: '20px' }}>No items in this category yet.</p>}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         {/* Add Category Modal */}
