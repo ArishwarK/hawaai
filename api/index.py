@@ -14,6 +14,9 @@ load_dotenv()
 
 
 app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
+if hasattr(app, 'json'):
+    app.json.sort_keys = False
 CORS(app)
 
 # Configuration from Environment Variables (Stripped of any whitespace)

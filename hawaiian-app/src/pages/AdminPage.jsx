@@ -39,7 +39,7 @@ const DraggableCategory = ({ catId, cat, setSelectedCategory, openEditCategory, 
                   ☰
                 </div>
                 <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: cat.color }}></div>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>{cat.label.replace(/^\d+\.\s*/, '')}</h2>
+                <h2 style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: 800, margin: 0 }}>{cat.label.replace(/^\d+\.\s*/, '')}</h2>
                 <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
                   <button onClick={() => openEditCategory(catId)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.2rem', opacity: 0.5 }} onMouseEnter={(e) => e.target.style.opacity = 1} onMouseLeave={(e) => e.target.style.opacity = 0.5} title="Edit Category">✏️</button>
                   <button onClick={() => deleteCategory(catId)} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#ff4d4d', opacity: 0.5 }} onMouseEnter={(e) => e.target.style.opacity = 1} onMouseLeave={(e) => e.target.style.opacity = 0.5} title="Delete Category">🗑️</button>
@@ -490,7 +490,7 @@ export default function AdminPage() {
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                         <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: cat.color }}></div>
-                        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>{cat.label.replace(/^\d+\.\s*/, '')}</h2>
+                        <h2 style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontWeight: 800, margin: 0 }}>{cat.label.replace(/^\d+\.\s*/, '')}</h2>
                       </div>
                     </div>
                   </div>
