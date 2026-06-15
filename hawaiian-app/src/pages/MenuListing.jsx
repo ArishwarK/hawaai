@@ -81,8 +81,8 @@ export default function MenuListing() {
                   </div>
                 </div>
                 <div style={{ padding: '32px', textAlign: 'center' }}>
-                  <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--charcoal)', marginBottom: '8px' }}>{cat.label.replace(/^\d+\.\s*/, '')}</h3>
-                  <p style={{ color: '#888', fontSize: '1rem', lineHeight: 1.5, marginBottom: '20px' }}>Explore the best {cat.label.replace(/^\d+\.\s*/, '')} varieties in town.</p>
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--charcoal)', marginBottom: '8px' }}>{cat.label}</h3>
+                  <p style={{ color: '#888', fontSize: '1rem', lineHeight: 1.5, marginBottom: '20px' }}>Explore the best {cat.label} varieties in town.</p>
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: 'var(--tropical-pink)', fontWeight: 700 }}>
                     View Details ➜
                   </div>

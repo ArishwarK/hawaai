@@ -343,7 +343,7 @@ export default function Home() {
                           transition={{ delay: 0.3 }}
                           style={{ fontSize: 'clamp(1.8rem, 8vw, 3rem)', fontWeight: 800, textShadow: '0 2px 10px rgba(0,0,0,0.3)', margin: 0, textAlign: 'center', lineHeight: 1.1, paddingBottom: '16px' }}
                         >
-                          {activeCategory.label.replace(/^\d+\.\s*/, '')}
+                          {activeCategory.label}
                         </motion.h3>
                       </div>
                     </Link>
