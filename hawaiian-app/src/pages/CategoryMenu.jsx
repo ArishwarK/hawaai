@@ -45,7 +45,7 @@ export default function CategoryMenu() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '64px' }}>
           <div style={{ width: '12px', height: '60px', borderRadius: '6px', backgroundColor: data.color || '#ccc', boxShadow: `0 0 20px ${data.color}44` }}></div>
           <div>
-            <h1 className="section-title" style={{ margin: 0, fontSize: '2.5rem' }}>{data.name}</h1>
+            <h1 className="section-title" style={{ margin: 0, fontSize: '2.5rem' }}>{data.name.replace(/^\d+\.\s*/, '')}</h1>
             <p style={{ color: '#888', marginTop: '4px', fontSize: '1.1rem' }}>{data.items.length} delicious varieties to choose from</p>
           </div>
         </div>
