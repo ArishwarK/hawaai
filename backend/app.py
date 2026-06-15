@@ -112,7 +112,7 @@ def load_menu():
     if not conn: return {}
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT cat_id, label, name, image, color FROM MENU_CATEGORIES")
+        cursor.execute("SELECT cat_id, label, name, image, color FROM MENU_CATEGORIES ORDER BY sort_order ASC")
         categories_db = cursor.fetchall()
         
         menu = {}
@@ -153,11 +153,11 @@ def save_menu(menu_dict):
         # Delete old menu to replace entirely as per previous behavior
         cursor.execute("DELETE FROM MENU_CATEGORIES") # cascade should delete items
         
-        for k, v in menu_dict.items():
+        for idx, (k, v) in enumerate(menu_dict.items()):
             cursor.execute("""
-                INSERT INTO MENU_CATEGORIES (cat_id, label, name, image, color)
-                VALUES (:1, :2, :3, :4, :5)
-            """, [k, v.get('label', ''), v.get('name', ''), v.get('image', ''), v.get('color', '')])
+                INSERT INTO MENU_CATEGORIES (cat_id, label, name, image, color, sort_order)
+                VALUES (:1, :2, :3, :4, :5, :6)
+            """, [k, v.get('label', ''), v.get('name', ''), v.get('image', ''), v.get('color', ''), idx])
             
             for item in v.get('items', []):
                  cursor.execute("""

@@ -74,7 +74,8 @@ def init_db():
                     label VARCHAR2(255),
                     name VARCHAR2(255),
                     image VARCHAR2(1000),
-                    color VARCHAR2(50)
+                    color VARCHAR2(50),
+                    sort_order NUMBER DEFAULT 0
                 )
             """)
             print("Created MENU_CATEGORIES table.")
@@ -91,6 +92,16 @@ def init_db():
         except oracledb.DatabaseError as e:
             error, = e.args
             if error.code == 955: print("MENU tables already exist.")
+            else: raise
+
+        # Migration: add sort_order column if it doesn't exist yet
+        try:
+            cursor.execute("ALTER TABLE MENU_CATEGORIES ADD sort_order NUMBER DEFAULT 0")
+            connection.commit()
+            print("Added sort_order column to MENU_CATEGORIES.")
+        except oracledb.DatabaseError as e:
+            error, = e.args
+            if error.code == 1430: print("sort_order column already exists.")  # ORA-01430: column already exists
             else: raise
 
         # Seed MENU if empty

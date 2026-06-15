@@ -186,6 +186,26 @@ export default function AdminPage() {
     openEditItem(catId, newIdx);
   };
 
+  const moveCategoryUp = (catId) => {
+    const keys = Object.keys(menu);
+    const idx = keys.indexOf(catId);
+    if (idx <= 0) return;
+    [keys[idx - 1], keys[idx]] = [keys[idx], keys[idx - 1]];
+    const reordered = {};
+    keys.forEach(k => { reordered[k] = menu[k]; });
+    setMenu(reordered);
+  };
+
+  const moveCategoryDown = (catId) => {
+    const keys = Object.keys(menu);
+    const idx = keys.indexOf(catId);
+    if (idx >= keys.length - 1) return;
+    [keys[idx], keys[idx + 1]] = [keys[idx + 1], keys[idx]];
+    const reordered = {};
+    keys.forEach(k => { reordered[k] = menu[k]; });
+    setMenu(reordered);
+  };
+
   const addReel = () => {
     setReels([...reels, ""]);
   };
@@ -250,6 +270,9 @@ export default function AdminPage() {
           .reels-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
           .menu-item-row { display: grid; grid-template-columns: 1fr 100px 1.5fr auto; gap: 20px; align-items: center; padding: 20px; border-radius: 20px; border: 1px solid #efefef; margin-bottom: 16px; background: #fff; transition: transform 0.1s; }
           .menu-item-row:active { transform: scale(0.99); }
+          .reorder-btn { width: 36px; height: 36px; border-radius: 10px; border: 1px solid #e0e0e0; background: #f8f9fa; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: all 0.2s; color: #555; }
+          .reorder-btn:hover { background: #e3f2fd; border-color: #90caf9; color: #1976d2; transform: scale(1.1); }
+          .reorder-btn:disabled { opacity: 0.25; cursor: not-allowed; transform: none; background: #f8f9fa; border-color: #e0e0e0; color: #ccc; }
           
           input { height: 44px; padding: 0 16px; border-radius: 12px; }
 
@@ -400,6 +423,24 @@ export default function AdminPage() {
                 <div style={{ flex: 1 }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <button
+                          className="reorder-btn"
+                          onClick={() => moveCategoryUp(catId)}
+                          disabled={Object.keys(menu).indexOf(catId) === 0}
+                          title="Move Up"
+                        >
+                          ▲
+                        </button>
+                        <button
+                          className="reorder-btn"
+                          onClick={() => moveCategoryDown(catId)}
+                          disabled={Object.keys(menu).indexOf(catId) === Object.keys(menu).length - 1}
+                          title="Move Down"
+                        >
+                          ▼
+                        </button>
+                      </div>
                       <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: cat.color }}></div>
                       <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>{cat.label}</h2>
                       <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>

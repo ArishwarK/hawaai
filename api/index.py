@@ -118,7 +118,7 @@ def save_reels(reels):
 
 def load_menu():
     # Fetch categories and items from Supabase
-    cats = sb_get('menu_categories', {'select': '*'})
+    cats = sb_get('menu_categories', {'select': '*', 'order': 'sort_order'})
     items = sb_get('menu_items', {'select': '*'})
     print(f"DEBUG: Loaded {len(cats)} categories and {len(items)} items from Supabase")
     menu = {}
@@ -167,13 +167,14 @@ def save_menu(menu_dict):
     all_categories = []
     all_items = []
     
-    for k, v in menu_dict.items():
+    for idx, (k, v) in enumerate(menu_dict.items()):
         all_categories.append({
             "cat_id": k, 
             "label": v.get('label'), 
             "name": v.get('name'),
             "image": v.get('image'), 
-            "color": v.get('color')
+            "color": v.get('color'),
+            "sort_order": idx
         })
         
         for item in v.get('items', []):

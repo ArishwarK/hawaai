@@ -1,6 +1,6 @@
 -- Hawaii'n Delight - Final Menu Seed
 -- 1. Create tables and disable security bits
-CREATE TABLE IF NOT EXISTS menu_categories (cat_id TEXT PRIMARY KEY, label TEXT, name TEXT, image TEXT, color TEXT);
+CREATE TABLE IF NOT EXISTS menu_categories (cat_id TEXT PRIMARY KEY, label TEXT, name TEXT, image TEXT, color TEXT, sort_order INTEGER DEFAULT 0);
 CREATE TABLE IF NOT EXISTS menu_items (id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, cat_id TEXT REFERENCES menu_categories(cat_id) ON DELETE CASCADE, name TEXT, price TEXT, description TEXT);
 ALTER TABLE menu_categories DISABLE ROW LEVEL SECURITY;
 ALTER TABLE menu_items DISABLE ROW LEVEL SECURITY;
