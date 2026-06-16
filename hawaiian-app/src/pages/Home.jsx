@@ -51,6 +51,14 @@ export default function Home() {
   const [aboutImageIndex, setAboutImageIndex] = useState(0);
   const [aboutImages, setAboutImages] = useState([]);
 
+  // Preload about images for instant transitions
+  useEffect(() => {
+    aboutImages.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, [aboutImages]);
+
   useEffect(() => {
     if (aboutImages.length === 0) return;
     const aboutTimer = setInterval(() => {
@@ -94,11 +102,31 @@ export default function Home() {
 
   const activeCategory = menuCategories[currentIndex];
 
+  // Preload next category image for instant transitions
+  useEffect(() => {
+    if (menuCategories.length <= 1) return;
+    const nextIndex = (currentIndex + 1) % menuCategories.length;
+    const prevIndex = currentIndex === 0 ? menuCategories.length - 1 : currentIndex - 1;
+    [nextIndex, prevIndex].forEach(idx => {
+      const img = new Image();
+      img.src = menuCategories[idx]?.image;
+    });
+  }, [currentIndex, menuCategories]);
+
+  // Preload all category images on first load
+  useEffect(() => {
+    if (menuCategories.length === 0) return;
+    menuCategories.forEach(cat => {
+      const img = new Image();
+      img.src = cat.image;
+    });
+  }, [menuCategories]);
+
   useEffect(() => {
     if (menuCategories.length === 0) return;
     const timer = setInterval(() => {
       nextSlide();
-    }, 6000); // 6 seconds
+    }, 6000);
 
     return () => clearInterval(timer);
   }, [currentIndex, menuCategories]);
@@ -262,20 +290,27 @@ export default function Home() {
             <motion.div className="about-img-wrap" style={{ position: 'relative' }}
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={fadeInLeft}>
               
-              <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', borderRadius: '24px', overflow: 'hidden' }}>
+              <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', borderRadius: '24px', overflow: 'hidden', boxShadow: '0 12px 40px rgba(0,0,0,0.1)' }}>
                 {aboutImages.length > 0 ? (
-                  aboutImages.map((src, index) => (
-                    <motion.img 
-                      key={src}
-                      src={src} 
-                      alt="Hawaii'n Delight Storefront" 
-                      loading={index === 0 ? "eager" : "lazy"} 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: index === aboutImageIndex ? 1 : 0 }}
-                      transition={{ duration: 0.8 }}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0, pointerEvents: index === aboutImageIndex ? 'auto' : 'none' }}
-                    />
-                  ))
+                  <AnimatePresence initial={false}>
+                    <motion.div
+                      key={aboutImageIndex}
+                      initial={{ opacity: 0, x: '100%', scale: 1.1 }}
+                      animate={{ opacity: 1, x: 0, scale: 1 }}
+                      exit={{ opacity: 0, x: '-100%', scale: 0.9 }}
+                      transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
+                      style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}
+                    >
+                      <motion.img 
+                        src={aboutImages[aboutImageIndex]} 
+                        alt="Hawaii'n Delight Storefront" 
+                        loading="eager"
+                        animate={{ scale: [1, 1.08] }}
+                        transition={{ duration: 5, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    </motion.div>
+                  </AnimatePresence>
                 ) : (
                   <div style={{ width: '100%', height: '100%', background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 0, left: 0 }}>
                     <span style={{ color: '#ccc' }}>No images available</span>

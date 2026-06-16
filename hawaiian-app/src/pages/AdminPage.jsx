@@ -53,6 +53,72 @@ const DraggableCategory = ({ catId, cat, setSelectedCategory, openEditCategory, 
   );
 };
 
+const AboutImageItem = ({ imgObj, idx, aboutImages, setAboutImages, isUploadingImage, handleImageUpload }) => {
+  const dragControls = useDragControls();
+
+  return (
+    <Reorder.Item 
+      key={imgObj.id} 
+      value={imgObj} 
+      dragListener={false} 
+      dragControls={dragControls}
+      style={{ background: '#fff', border: '1px solid #eee', borderRadius: '16px', padding: '12px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)', overflow: 'hidden' }}
+    >
+      <div 
+        onPointerDown={(e) => dragControls.start(e)} 
+        style={{ cursor: 'grab', fontSize: '1.5rem', color: '#bbb', touchAction: 'none', userSelect: 'none', flexShrink: 0, padding: '4px' }} 
+        title="Drag to reorder"
+      >☰</div>
+      {imgObj.url && <img src={imgObj.url} alt={`Preview ${idx}`} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} />}
+      <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+          <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>Image {idx + 1}</label>
+          <button 
+            onClick={() => {
+              const newImages = [...aboutImages];
+              newImages.splice(idx, 1);
+              setAboutImages(newImages);
+            }}
+            style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1rem', color: '#ff4d4d', opacity: 0.6, flexShrink: 0 }}
+            onMouseEnter={(e) => e.target.style.opacity = 1}
+            onMouseLeave={(e) => e.target.style.opacity = 0.6}
+          >
+            🗑️
+          </button>
+        </div>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <input 
+            value={imgObj.url}
+            onChange={(e) => {
+              const newImages = [...aboutImages];
+              newImages[idx] = { ...newImages[idx], url: e.target.value };
+              setAboutImages(newImages);
+            }}
+            placeholder="Paste image URL or upload →"
+            style={{ flex: 1, padding: '8px 10px', borderRadius: '8px', border: '1px solid #eee', fontSize: '0.8rem', outline: 'none', background: '#fcfcfc', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}
+            onFocus={(e) => e.target.style.borderColor = 'var(--tropical-pink)'}
+            onBlur={(e) => e.target.style.borderColor = '#eee'}
+          />
+          <label style={{ background: isUploadingImage ? '#f5f5f5' : '#e3f2fd', color: isUploadingImage ? '#888' : '#1976d2', padding: '8px 12px', borderRadius: '8px', cursor: isUploadingImage ? 'not-allowed' : 'pointer', fontSize: '0.8rem', fontWeight: 700, whiteSpace: 'nowrap', opacity: isUploadingImage ? 0.7 : 1, flexShrink: 0 }}>
+            <span>{isUploadingImage ? "⏳" : "📷"}</span>
+            <input type="file" accept="image/*" disabled={isUploadingImage} style={{ display: 'none' }} onChange={(e) => {
+              if (e.target.files[0]) {
+                handleImageUpload(e.target.files[0]).then(url => {
+                  if(url) {
+                    const newImages = [...aboutImages];
+                    newImages[idx] = { ...newImages[idx], url };
+                    setAboutImages(newImages);
+                  }
+                });
+              }
+            }} />
+          </label>
+        </div>
+      </div>
+    </Reorder.Item>
+  );
+};
+
 export default function AdminPage() {
   const [menu, setMenu] = useState(null);
   const [reels, setReels] = useState([]);
@@ -494,55 +560,15 @@ export default function AdminPage() {
               style={{ display: 'flex', flexDirection: 'column', gap: '16px', listStyle: 'none', padding: 0, margin: 0 }}
             >
               {aboutImages.map((imgObj, idx) => (
-                <Reorder.Item key={imgObj.id} value={imgObj} style={{ background: '#fff', border: '1px solid #eee', borderRadius: '16px', padding: '16px', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                  <div style={{ cursor: 'grab', fontSize: '1.5rem', color: '#bbb' }} title="Drag to reorder">☰</div>
-                  {imgObj.url && <img src={imgObj.url} alt={`Preview ${idx}`} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }} />}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>Image {idx + 1}</label>
-                      <button 
-                        onClick={() => {
-                          const newImages = [...aboutImages];
-                          newImages.splice(idx, 1);
-                          setAboutImages(newImages);
-                        }}
-                        style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1rem', color: '#ff4d4d', opacity: 0.6 }}
-                        onMouseEnter={(e) => e.target.style.opacity = 1}
-                        onMouseLeave={(e) => e.target.style.opacity = 0.6}
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                      <input 
-                        value={imgObj.url}
-                        onChange={(e) => {
-                          const newImages = [...aboutImages];
-                          newImages[idx].url = e.target.value;
-                          setAboutImages(newImages);
-                        }}
-                        placeholder="Image URL"
-                        style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #eee', fontSize: '0.9rem', outline: 'none', background: '#fcfcfc', minWidth: 0 }}
-                        onFocus={(e) => e.target.style.borderColor = 'var(--tropical-pink)'}
-                        onBlur={(e) => e.target.style.borderColor = '#eee'}
-                      />
-                      <label style={{ background: isUploadingImage ? '#f5f5f5' : '#e3f2fd', color: isUploadingImage ? '#888' : '#1976d2', padding: '10px 16px', borderRadius: '8px', cursor: isUploadingImage ? 'not-allowed' : 'pointer', fontSize: '0.9rem', fontWeight: 700, whiteSpace: 'nowrap', opacity: isUploadingImage ? 0.7 : 1 }}>
-                        <span>{isUploadingImage ? "⏳" : "📷 Upload"}</span>
-                        <input type="file" accept="image/*" disabled={isUploadingImage} style={{ display: 'none' }} onChange={(e) => {
-                          if (e.target.files[0]) {
-                            handleImageUpload(e.target.files[0]).then(url => {
-                              if(url) {
-                                const newImages = [...aboutImages];
-                                newImages[idx].url = url;
-                                setAboutImages(newImages);
-                              }
-                            });
-                          }
-                        }} />
-                      </label>
-                    </div>
-                  </div>
-                </Reorder.Item>
+                <AboutImageItem
+                  key={imgObj.id}
+                  imgObj={imgObj}
+                  idx={idx}
+                  aboutImages={aboutImages}
+                  setAboutImages={setAboutImages}
+                  isUploadingImage={isUploadingImage}
+                  handleImageUpload={handleImageUpload}
+                />
               ))}
             </Reorder.Group>
             {aboutImages.length === 0 && (
