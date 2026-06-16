@@ -187,10 +187,17 @@ export default function Home() {
           </motion.h1>
 
           <motion.p
-            style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)', color: '#444', fontWeight: 600, marginBottom: '32px', maxWidth: '600px', marginInline: 'auto' }}
+            style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)', color: '#444', fontWeight: 600, marginBottom: '16px', maxWidth: '600px', marginInline: 'auto' }}
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 0.7 }}
           >
-            Authentic Bubble Tea • Hawaiian Shaved Ice • Chill Vibes
+            Island-Inspired Bites, Sips & Sweet Delights
+          </motion.p>
+          
+          <motion.p
+            style={{ fontSize: 'clamp(0.85rem, 2.5vw, 1.1rem)', color: '#666', fontWeight: 500, marginBottom: '32px', maxWidth: '700px', marginInline: 'auto' }}
+            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0, duration: 0.7 }}
+          >
+            Bubble Tea • Burgers • Sandwiches • Shaved Ice • Mochi Donuts • Desserts
           </motion.p>
 
 
@@ -639,14 +646,16 @@ export default function Home() {
                 <MapPin color="var(--tropical-pink)" size={28} style={{ marginTop: '4px' }} />
                 <div>
                   <h4 className="loc-item-title" style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '4px' }}>Address</h4>
-                  <p className="loc-item-desc" style={{ color: '#aaa', lineHeight: 1.5 }}>JB Towers, Avinashi Rd, opp. Coimbatore Medical College, Peelamedu, Coimbatore, 641014</p>
+                  <p className="loc-item-desc" style={{ color: '#aaa', lineHeight: 1.5 }}>JB Towers, 77/1, Avinashi Rd, opp. Coimbatore Medical College, Dr. Jaganathan Nagar, Peelamedu, Coimbatore, Tamil Nadu 641014, India</p>
                 </div>
               </div>
               <div className="loc-item flex" style={{ gap: '16px' }}>
                 <ClockIcon color="var(--pastel-blue)" size={28} />
                 <div>
                   <h4 className="loc-item-title" style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '4px' }}>Open Hours</h4>
-                  <p className="loc-item-desc" style={{ color: '#aaa', lineHeight: 1.5 }}>11:00 AM – 11:00 PM (Every Day)</p>
+                  <p className="loc-item-desc" style={{ color: '#aaa', lineHeight: 1.5, margin: 0 }}>11:00 AM – 11:00 PM (Monday to Thursday)</p>
+                  <p className="loc-item-desc" style={{ color: '#aaa', lineHeight: 1.5, margin: 0 }}>11:00 AM – 11:30 PM (Friday & Saturday)</p>
+                  <p className="loc-item-desc" style={{ color: '#aaa', lineHeight: 1.5, margin: 0 }}>11:00 AM – 10:00 PM (Sunday)</p>
                 </div>
               </div>
               <div className="loc-item flex" style={{ gap: '16px' }}>
@@ -654,6 +663,20 @@ export default function Home() {
                 <div>
                   <h4 className="loc-item-title" style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '4px' }}>Services</h4>
                   <p className="loc-item-desc" style={{ color: '#aaa', lineHeight: 1.5 }}>Dine-in | Takeaway | Delivery</p>
+                </div>
+              </div>
+              <div className="loc-item flex" style={{ gap: '16px' }}>
+                <Star color="var(--tropical-pink)" size={28} />
+                <div>
+                  <h4 className="loc-item-title" style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '4px' }}>Amenities</h4>
+                  <p className="loc-item-desc" style={{ color: '#aaa', lineHeight: 1.5 }}>Free Wifi | Laptop Charging | Mobile Charging Station</p>
+                </div>
+              </div>
+              <div className="loc-item flex" style={{ gap: '16px' }}>
+                <Users color="var(--pastel-blue)" size={28} />
+                <div>
+                  <h4 className="loc-item-title" style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '4px' }}>The Best Place For</h4>
+                  <p className="loc-item-desc" style={{ color: '#aaa', lineHeight: 1.5 }}>Birthday Parties | Business Meetings | Family Gatherings</p>
                 </div>
               </div>
             </div>
