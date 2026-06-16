@@ -330,8 +330,30 @@ def handle_upload():
         
     # Generate unique filename
     ext = file.filename.rsplit('.', 1)[-1].lower()
-    if ext not in ['jpg', 'jpeg', 'png', 'webp', 'gif']:
-        return jsonify({"error": "Invalid file type"}), 400
+    allowed_exts = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'heic', 'heif', 'avif', 'bmp', 'tiff', 'tif', 'svg']
+    if ext not in allowed_exts:
+        return jsonify({"error": f"Invalid file type '.{ext}'. Supported: {', '.join(allowed_exts)}"}), 400
+    
+    # Convert non-web formats to JPEG for compatibility
+    file_data = file.read()
+    content_type = file.content_type or "application/octet-stream"
+    needs_conversion = ext in ['heic', 'heif', 'avif', 'bmp', 'tiff', 'tif']
+    
+    if needs_conversion:
+        try:
+            from PIL import Image
+            import io
+            img = Image.open(io.BytesIO(file_data))
+            if img.mode in ('RGBA', 'LA', 'P'):
+                img = img.convert('RGB')
+            output = io.BytesIO()
+            img.save(output, format='JPEG', quality=85)
+            file_data = output.getvalue()
+            ext = 'jpg'
+            content_type = 'image/jpeg'
+        except Exception as conv_err:
+            print(f"Image conversion error: {conv_err}")
+            return jsonify({"error": f"Could not convert .{ext} image. Try uploading as JPG or PNG."}), 400
         
     filename = f"{int(time.time())}_{hashlib.md5(file.filename.encode()).hexdigest()[:8]}.{ext}"
     
@@ -341,9 +363,9 @@ def handle_upload():
         headers = {
             "apikey": SUPABASE_KEY,
             "Authorization": f"Bearer {SUPABASE_KEY}",
-            "Content-Type": file.content_type or "application/octet-stream"
+            "Content-Type": content_type
         }
-        r = http_requests.post(url, headers=headers, data=file.read(), timeout=30)
+        r = http_requests.post(url, headers=headers, data=file_data, timeout=30)
         
         if r.status_code in (200, 201):
             public_url = f"{SUPABASE_URL}/storage/v1/object/public/menu_images/{filename}"

@@ -324,12 +324,51 @@ export default function AdminPage() {
     setReels(newReels);
   };
 
+  // Convert image to JPEG using canvas for browser-compatible uploads
+  const convertImageToJpeg = (file) => {
+    return new Promise((resolve) => {
+      const ext = file.name.split('.').pop().toLowerCase();
+      const webFormats = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+      // If already a web format, no conversion needed
+      if (webFormats.includes(ext)) {
+        resolve(file);
+        return;
+      }
+      // Try canvas-based conversion
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const convertedFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
+              resolve(convertedFile);
+            } else {
+              // Fallback: send original file, let server handle it
+              resolve(file);
+            }
+          }, 'image/jpeg', 0.85);
+        };
+        img.onerror = () => resolve(file); // Fallback to original
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(file); // Fallback to original
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleImageUpload = async (file) => {
     if (!file) return null;
     setIsUploadingImage(true);
-    const formData = new FormData();
-    formData.append('file', file);
     try {
+      const convertedFile = await convertImageToJpeg(file);
+      const formData = new FormData();
+      formData.append('file', convertedFile);
       const res = await fetch('/api/upload', {
         method: 'POST',
         headers: { 'Authorization': token },
