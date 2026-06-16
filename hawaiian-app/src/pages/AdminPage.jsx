@@ -133,23 +133,23 @@ export default function AdminPage() {
       };
 
 
-      const [menuRes, reelsRes, aboutRes] = await Promise.all([
-        fetch('/api/menu', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(menu)
-        }),
-        fetch('/api/reels', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(reels.filter(id => id.trim() !== ""))
-        }),
-        fetch('/api/about-images', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(aboutImages.filter(img => img.trim() !== ""))
-        })
-      ]);
+      const menuRes = await fetch('/api/menu', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(menu)
+      });
+      
+      const reelsRes = await fetch('/api/reels', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(reels.filter(id => id.trim() !== ""))
+      });
+      
+      const aboutRes = await fetch('/api/about-images', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(aboutImages.filter(img => img.trim() !== ""))
+      });
 
 
       if (menuRes.ok && reelsRes.ok && aboutRes.ok) {

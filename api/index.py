@@ -119,7 +119,7 @@ def save_reels(reels):
     sb_delete('reels', 'id', 'neq', '-1')
     combined = reels + [f"ABOUT_IMG:{img}" for img in existing_about]
     if combined:
-        res = sb_post('reels', [{"id": i+1, "reel_id": r} for i, r in enumerate(combined)])
+        res = sb_post('reels', [{"reel_id": r} for r in combined])
         return res
     return True
 
@@ -128,7 +128,7 @@ def save_about_images(images):
     sb_delete('reels', 'id', 'neq', '-1')
     combined = existing_reels + [f"ABOUT_IMG:{img}" for img in images]
     if combined:
-        res = sb_post('reels', [{"id": i+1, "reel_id": r} for i, r in enumerate(combined)])
+        res = sb_post('reels', [{"reel_id": r} for r in combined])
         return res
     return True
 
