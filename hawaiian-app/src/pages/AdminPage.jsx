@@ -324,40 +324,44 @@ export default function AdminPage() {
     setReels(newReels);
   };
 
-  // Convert image to JPEG using canvas for browser-compatible uploads
-  const convertImageToJpeg = (file) => {
+  // Compress and convert any image to JPEG, resize if too large (Vercel has 4.5MB limit)
+  const compressImage = (file, maxWidth = 1200, quality = 0.8) => {
     return new Promise((resolve) => {
-      const ext = file.name.split('.').pop().toLowerCase();
-      const webFormats = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
-      // If already a web format, no conversion needed
-      if (webFormats.includes(ext)) {
+      // If file is already small enough and is jpg/png, skip conversion
+      if (file.size < 500000 && ['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
         resolve(file);
         return;
       }
-      // Try canvas-based conversion
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new window.Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          canvas.width = img.width;
-          canvas.height = img.height;
+          let width = img.width;
+          let height = img.height;
+          // Resize if wider than maxWidth
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+          canvas.width = width;
+          canvas.height = height;
           const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0);
+          ctx.drawImage(img, 0, 0, width, height);
           canvas.toBlob((blob) => {
             if (blob) {
-              const convertedFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
-              resolve(convertedFile);
+              const newName = file.name.replace(/\.[^.]+$/, '.jpg');
+              const compressedFile = new File([blob], newName, { type: 'image/jpeg' });
+              resolve(compressedFile);
             } else {
-              // Fallback: send original file, let server handle it
               resolve(file);
             }
-          }, 'image/jpeg', 0.85);
+          }, 'image/jpeg', quality);
         };
-        img.onerror = () => resolve(file); // Fallback to original
+        img.onerror = () => resolve(file);
         img.src = e.target.result;
       };
-      reader.onerror = () => resolve(file); // Fallback to original
+      reader.onerror = () => resolve(file);
       reader.readAsDataURL(file);
     });
   };
@@ -366,9 +370,9 @@ export default function AdminPage() {
     if (!file) return null;
     setIsUploadingImage(true);
     try {
-      const convertedFile = await convertImageToJpeg(file);
+      const compressedFile = await compressImage(file);
       const formData = new FormData();
-      formData.append('file', convertedFile);
+      formData.append('file', compressedFile);
       const res = await fetch('/api/upload', {
         method: 'POST',
         headers: { 'Authorization': token },
@@ -384,7 +388,7 @@ export default function AdminPage() {
       return null;
     } catch (err) {
       setIsUploadingImage(false);
-      alert("Upload failed. Connect backend properly.");
+      alert("Upload failed: " + err.message);
       return null;
     }
   };
