@@ -194,6 +194,7 @@ function Footer() {
 
 function FloatingActions() {
   const { pathname } = useLocation();
+  const [isHovered, setIsHovered] = useState(false);
   
   // Hide the WhatsApp button on the admin page
   if (pathname.startsWith('/admin') || pathname === '/login') {
@@ -201,8 +202,21 @@ function FloatingActions() {
   }
 
   return (
-    <div className="floating-actions" style={{ position: 'fixed', bottom: '24px', right: '24px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px', zIndex: 100 }}>
-      <div style={{ background: 'white', padding: '8px 14px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', fontSize: '0.9rem', fontWeight: 600, color: '#333' }}>
+    <div 
+      className="floating-actions" 
+      style={{ position: 'fixed', bottom: '24px', right: '24px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px', zIndex: 100 }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div style={{ 
+        background: 'white', padding: '8px 14px', borderRadius: '12px', 
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)', fontSize: '0.9rem', 
+        fontWeight: 600, color: '#333',
+        opacity: isHovered ? 1 : 0,
+        transform: isHovered ? 'translateY(0)' : 'translateY(10px)',
+        pointerEvents: 'none',
+        transition: 'all 0.3s ease'
+      }}>
         Send WhatsApp Message
       </div>
       <a href="https://wa.me/919442728028" className="float-btn" aria-label="Chat on WhatsApp" target="_blank" rel="noreferrer" style={{ width: '60px', height: '60px', borderRadius: '50%', background: '#25D366', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(37,211,102,0.4)', transition: 'transform 0.2s', textDecoration: 'none' }}>

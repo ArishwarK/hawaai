@@ -108,14 +108,27 @@ def is_authenticated():
 
 def load_reels():
     rows = sb_get('reels', {'select': 'reel_id', 'order': 'id'})
-    return [r['reel_id'] for r in rows] if rows else []
+    return [r['reel_id'] for r in rows if r and 'reel_id' in r and not r['reel_id'].startswith('ABOUT_IMG:')]
+
+def load_about_images():
+    rows = sb_get('reels', {'select': 'reel_id', 'order': 'id'})
+    return [r['reel_id'].replace('ABOUT_IMG:', '') for r in rows if r and 'reel_id' in r and r['reel_id'].startswith('ABOUT_IMG:')]
 
 def save_reels(reels):
+    existing_about = load_about_images()
     sb_delete('reels', 'id', 'neq', '-1')
-    if reels:
-        # We catch any exception in sb_post by modifying it locally just for reels if needed,
-        # but let's just use the default and see if it fails.
-        res = sb_post('reels', [{"id": i+1, "reel_id": r} for i, r in enumerate(reels)])
+    combined = reels + [f"ABOUT_IMG:{img}" for img in existing_about]
+    if combined:
+        res = sb_post('reels', [{"id": i+1, "reel_id": r} for i, r in enumerate(combined)])
+        return res
+    return True
+
+def save_about_images(images):
+    existing_reels = load_reels()
+    sb_delete('reels', 'id', 'neq', '-1')
+    combined = existing_reels + [f"ABOUT_IMG:{img}" for img in images]
+    if combined:
+        res = sb_post('reels', [{"id": i+1, "reel_id": r} for i, r in enumerate(combined)])
         return res
     return True
 
@@ -265,19 +278,34 @@ def handle_reels():
         data = request.get_json(silent=True)
         if not isinstance(data, list): return jsonify({"error": "Invalid data"}), 400
         
-        # Manually run save_reels logic and catch errors
         try:
-            sb_delete('reels', 'id', 'neq', '-1')
-            if data:
-                url = f"{SUPABASE_URL}/rest/v1/reels"
-                r = http_requests.post(url, headers=sb_headers(), json=[{"reel_id": r} for r in data], timeout=15)
-                if r.status_code not in (200, 201, 204):
-                    return jsonify({"error": f"Supabase error: {r.status_code} {r.text}"}), 500
-            return jsonify({"message": "Reels saved"}), 200
+            success = save_reels(data)
+            if success:
+                return jsonify({"message": "Reels saved"}), 200
+            else:
+                return jsonify({"error": "Failed to save reels"}), 500
         except Exception as e:
             return jsonify({"error": str(e)}), 500
             
     return jsonify(load_reels())
+
+@app.route('/api/about-images', methods=['GET', 'POST'])
+def handle_about_images():
+    if request.method == 'POST':
+        if not is_authenticated(): return jsonify({"error": "Unauthorized"}), 401
+        data = request.get_json(silent=True)
+        if not isinstance(data, list): return jsonify({"error": "Invalid data"}), 400
+        
+        try:
+            success = save_about_images(data)
+            if success:
+                return jsonify({"message": "About images saved"}), 200
+            else:
+                return jsonify({"error": "Failed to save about images"}), 500
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+            
+    return jsonify(load_about_images())
 
 @app.route('/api/reviews', methods=['GET', 'POST'])
 def handle_reviews():

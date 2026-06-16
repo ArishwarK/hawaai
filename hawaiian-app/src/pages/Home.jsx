@@ -49,23 +49,33 @@ export default function Home() {
   const [selectedReel, setSelectedReel] = useState(null);
   
   const [aboutImageIndex, setAboutImageIndex] = useState(0);
-  const aboutImages = ['/opening1.jpg', '/opening2.jpg', '/opening3.jpg'];
+  const [aboutImages, setAboutImages] = useState(['/opening1.jpg', '/opening2.jpg', '/opening3.jpg']);
 
   useEffect(() => {
+    if (aboutImages.length === 0) return;
     const aboutTimer = setInterval(() => {
       setAboutImageIndex((prev) => (prev + 1) % aboutImages.length);
     }, 4000);
     return () => clearInterval(aboutTimer);
-  }, []);
+  }, [aboutImages]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const reelsRes = await fetch('/api/reels');
+        const [reelsRes, aboutRes] = await Promise.all([
+          fetch('/api/reels'),
+          fetch('/api/about-images')
+        ]);
         
         if (reelsRes.ok) {
           const reelsData = await reelsRes.json();
           setReels(reelsData);
+        }
+        if (aboutRes.ok) {
+          const aboutData = await aboutRes.json();
+          if (aboutData && aboutData.length > 0) {
+            setAboutImages(aboutData);
+          }
         }
       } catch (err) {
         console.error("Failed to fetch data from API", err);

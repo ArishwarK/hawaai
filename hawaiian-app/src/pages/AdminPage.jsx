@@ -56,6 +56,7 @@ const DraggableCategory = ({ catId, cat, setSelectedCategory, openEditCategory, 
 export default function AdminPage() {
   const [menu, setMenu] = useState(null);
   const [reels, setReels] = useState([]);
+  const [aboutImages, setAboutImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
@@ -94,9 +95,10 @@ export default function AdminPage() {
     setLoading(true);
     setErrorDetails(null);
     try {
-      const [menuRes, reelsRes] = await Promise.all([
+      const [menuRes, reelsRes, aboutRes] = await Promise.all([
         fetch(`/api/menu?cb=${Date.now()}`),
-        fetch('/api/reels')
+        fetch('/api/reels'),
+        fetch('/api/about-images')
       ]);
 
       
@@ -105,10 +107,14 @@ export default function AdminPage() {
 
       const menuData = await menuRes.json();
       const reelsData = await reelsRes.json();
+      const aboutData = aboutRes.ok ? await aboutRes.json() : [];
 
       if (menuData) setMenu(menuData);
       if (reelsData) {
         setReels(reelsData);
+      }
+      if (aboutData) {
+        setAboutImages(aboutData);
       }
     } catch (err) {
       console.error("Failed to fetch data from API", err);
@@ -127,7 +133,7 @@ export default function AdminPage() {
       };
 
 
-      const [menuRes, reelsRes] = await Promise.all([
+      const [menuRes, reelsRes, aboutRes] = await Promise.all([
         fetch('/api/menu', {
           method: 'POST',
           headers,
@@ -137,11 +143,16 @@ export default function AdminPage() {
           method: 'POST',
           headers,
           body: JSON.stringify(reels.filter(id => id.trim() !== ""))
+        }),
+        fetch('/api/about-images', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(aboutImages.filter(img => img.trim() !== ""))
         })
       ]);
 
 
-      if (menuRes.ok && reelsRes.ok) {
+      if (menuRes.ok && reelsRes.ok && aboutRes.ok) {
         setMessage({ type: 'success', text: 'All changes saved to database!' });
         // Refetch the latest data to update UI
         await fetchData();
@@ -448,6 +459,85 @@ export default function AdminPage() {
               ))}
               {reels.length === 0 && (
                 <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#aaa', padding: '20px', margin: 0 }}>No reels added yet. Click "+ Add Reel" to begin.</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* About Images Editor */}
+        {!selectedCategory && (
+          <div className="admin-card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h2 style={{ fontSize: '1.3rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                📸 About Us Images
+              </h2>
+              <button 
+                onClick={() => setAboutImages([...aboutImages, ""])}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: '#e3f2fd',
+                  color: '#1976d2',
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
+                  cursor: 'pointer'
+                }}
+              >
+                + Add Image
+              </button>
+            </div>
+            <div className="reels-grid">
+              {aboutImages.map((img, idx) => (
+                <div key={idx} style={{ position: 'relative' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>Image {idx + 1}</label>
+                    <button 
+                      onClick={() => {
+                        const newImages = [...aboutImages];
+                        newImages.splice(idx, 1);
+                        setAboutImages(newImages);
+                      }}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1rem', color: '#ff4d4d', opacity: 0.6 }}
+                      onMouseEnter={(e) => e.target.style.opacity = 1}
+                      onMouseLeave={(e) => e.target.style.opacity = 0.6}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <input 
+                      value={img}
+                      onChange={(e) => {
+                        const newImages = [...aboutImages];
+                        newImages[idx] = e.target.value;
+                        setAboutImages(newImages);
+                      }}
+                      placeholder="Image URL"
+                      style={{ flex: 1, width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #eee', fontSize: '0.9rem', outline: 'none', background: '#fcfcfc', minWidth: 0 }}
+                      onFocus={(e) => e.target.style.borderColor = 'var(--tropical-pink)'}
+                      onBlur={(e) => e.target.style.borderColor = '#eee'}
+                    />
+                    <label style={{ background: isUploadingImage ? '#f5f5f5' : '#e3f2fd', color: isUploadingImage ? '#888' : '#1976d2', padding: '12px', borderRadius: '12px', cursor: isUploadingImage ? 'not-allowed' : 'pointer', fontSize: '0.9rem', fontWeight: 700, whiteSpace: 'nowrap', opacity: isUploadingImage ? 0.7 : 1 }}>
+                      <span>{isUploadingImage ? "⏳" : "📷"}</span>
+                      <input type="file" accept="image/*" disabled={isUploadingImage} style={{ display: 'none' }} onChange={(e) => {
+                        if (e.target.files[0]) {
+                          handleImageUpload(e.target.files[0]).then(url => {
+                            if(url) {
+                              const newImages = [...aboutImages];
+                              newImages[idx] = url;
+                              setAboutImages(newImages);
+                            }
+                          });
+                        }
+                      }} />
+                    </label>
+                  </div>
+                  {img && <img src={img} alt={`Preview ${idx}`} style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px', marginTop: '8px', border: '1px solid #eee' }} />}
+                </div>
+              ))}
+              {aboutImages.length === 0 && (
+                <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#aaa', padding: '20px', margin: 0 }}>No images added yet. Click "+ Add Image" to begin.</p>
               )}
             </div>
           </div>
