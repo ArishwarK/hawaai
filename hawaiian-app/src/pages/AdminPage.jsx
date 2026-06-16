@@ -114,7 +114,7 @@ export default function AdminPage() {
         setReels(reelsData);
       }
       if (aboutData) {
-        setAboutImages(aboutData);
+        setAboutImages(aboutData.map(url => ({ id: Math.random().toString(36).substr(2, 9), url })));
       }
     } catch (err) {
       console.error("Failed to fetch data from API", err);
@@ -148,7 +148,7 @@ export default function AdminPage() {
       const aboutRes = await fetch('/api/about-images', {
         method: 'POST',
         headers,
-        body: JSON.stringify(aboutImages.filter(img => img.trim() !== ""))
+        body: JSON.stringify(aboutImages.map(img => img.url).filter(url => url.trim() !== ""))
       });
 
 
@@ -472,7 +472,7 @@ export default function AdminPage() {
                 📸 About Us Images
               </h2>
               <button 
-                onClick={() => setAboutImages([...aboutImages, ""])}
+                onClick={() => setAboutImages([...aboutImages, { id: Math.random().toString(36).substr(2, 9), url: '' }])}
                 style={{
                   padding: '8px 16px',
                   borderRadius: '10px',
@@ -487,59 +487,67 @@ export default function AdminPage() {
                 + Add Image
               </button>
             </div>
-            <div className="reels-grid">
-              {aboutImages.map((img, idx) => (
-                <div key={idx} style={{ position: 'relative' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>Image {idx + 1}</label>
-                    <button 
-                      onClick={() => {
-                        const newImages = [...aboutImages];
-                        newImages.splice(idx, 1);
-                        setAboutImages(newImages);
-                      }}
-                      style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1rem', color: '#ff4d4d', opacity: 0.6 }}
-                      onMouseEnter={(e) => e.target.style.opacity = 1}
-                      onMouseLeave={(e) => e.target.style.opacity = 0.6}
-                    >
-                      🗑️
-                    </button>
+            <Reorder.Group 
+              axis="y" 
+              values={aboutImages} 
+              onReorder={setAboutImages}
+              style={{ display: 'flex', flexDirection: 'column', gap: '16px', listStyle: 'none', padding: 0, margin: 0 }}
+            >
+              {aboutImages.map((imgObj, idx) => (
+                <Reorder.Item key={imgObj.id} value={imgObj} style={{ background: '#fff', border: '1px solid #eee', borderRadius: '16px', padding: '16px', display: 'flex', alignItems: 'center', gap: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                  <div style={{ cursor: 'grab', fontSize: '1.5rem', color: '#bbb' }} title="Drag to reorder">☰</div>
+                  {imgObj.url && <img src={imgObj.url} alt={`Preview ${idx}`} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }} />}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>Image {idx + 1}</label>
+                      <button 
+                        onClick={() => {
+                          const newImages = [...aboutImages];
+                          newImages.splice(idx, 1);
+                          setAboutImages(newImages);
+                        }}
+                        style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1rem', color: '#ff4d4d', opacity: 0.6 }}
+                        onMouseEnter={(e) => e.target.style.opacity = 1}
+                        onMouseLeave={(e) => e.target.style.opacity = 0.6}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <input 
+                        value={imgObj.url}
+                        onChange={(e) => {
+                          const newImages = [...aboutImages];
+                          newImages[idx].url = e.target.value;
+                          setAboutImages(newImages);
+                        }}
+                        placeholder="Image URL"
+                        style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #eee', fontSize: '0.9rem', outline: 'none', background: '#fcfcfc', minWidth: 0 }}
+                        onFocus={(e) => e.target.style.borderColor = 'var(--tropical-pink)'}
+                        onBlur={(e) => e.target.style.borderColor = '#eee'}
+                      />
+                      <label style={{ background: isUploadingImage ? '#f5f5f5' : '#e3f2fd', color: isUploadingImage ? '#888' : '#1976d2', padding: '10px 16px', borderRadius: '8px', cursor: isUploadingImage ? 'not-allowed' : 'pointer', fontSize: '0.9rem', fontWeight: 700, whiteSpace: 'nowrap', opacity: isUploadingImage ? 0.7 : 1 }}>
+                        <span>{isUploadingImage ? "⏳" : "📷 Upload"}</span>
+                        <input type="file" accept="image/*" disabled={isUploadingImage} style={{ display: 'none' }} onChange={(e) => {
+                          if (e.target.files[0]) {
+                            handleImageUpload(e.target.files[0]).then(url => {
+                              if(url) {
+                                const newImages = [...aboutImages];
+                                newImages[idx].url = url;
+                                setAboutImages(newImages);
+                              }
+                            });
+                          }
+                        }} />
+                      </label>
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <input 
-                      value={img}
-                      onChange={(e) => {
-                        const newImages = [...aboutImages];
-                        newImages[idx] = e.target.value;
-                        setAboutImages(newImages);
-                      }}
-                      placeholder="Image URL"
-                      style={{ flex: 1, width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #eee', fontSize: '0.9rem', outline: 'none', background: '#fcfcfc', minWidth: 0 }}
-                      onFocus={(e) => e.target.style.borderColor = 'var(--tropical-pink)'}
-                      onBlur={(e) => e.target.style.borderColor = '#eee'}
-                    />
-                    <label style={{ background: isUploadingImage ? '#f5f5f5' : '#e3f2fd', color: isUploadingImage ? '#888' : '#1976d2', padding: '12px', borderRadius: '12px', cursor: isUploadingImage ? 'not-allowed' : 'pointer', fontSize: '0.9rem', fontWeight: 700, whiteSpace: 'nowrap', opacity: isUploadingImage ? 0.7 : 1 }}>
-                      <span>{isUploadingImage ? "⏳" : "📷"}</span>
-                      <input type="file" accept="image/*" disabled={isUploadingImage} style={{ display: 'none' }} onChange={(e) => {
-                        if (e.target.files[0]) {
-                          handleImageUpload(e.target.files[0]).then(url => {
-                            if(url) {
-                              const newImages = [...aboutImages];
-                              newImages[idx] = url;
-                              setAboutImages(newImages);
-                            }
-                          });
-                        }
-                      }} />
-                    </label>
-                  </div>
-                  {img && <img src={img} alt={`Preview ${idx}`} style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px', marginTop: '8px', border: '1px solid #eee' }} />}
-                </div>
+                </Reorder.Item>
               ))}
-              {aboutImages.length === 0 && (
-                <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#aaa', padding: '20px', margin: 0 }}>No images added yet. Click "+ Add Image" to begin.</p>
-              )}
-            </div>
+            </Reorder.Group>
+            {aboutImages.length === 0 && (
+              <p style={{ textAlign: 'center', color: '#aaa', padding: '20px', margin: 0 }}>No images added yet. Click "+ Add Image" to begin.</p>
+            )}
           </div>
         )}
 

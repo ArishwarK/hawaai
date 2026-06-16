@@ -49,7 +49,7 @@ export default function Home() {
   const [selectedReel, setSelectedReel] = useState(null);
   
   const [aboutImageIndex, setAboutImageIndex] = useState(0);
-  const [aboutImages, setAboutImages] = useState(['/opening1.jpg', '/opening2.jpg', '/opening3.jpg']);
+  const [aboutImages, setAboutImages] = useState([]);
 
   useEffect(() => {
     if (aboutImages.length === 0) return;
@@ -73,9 +73,7 @@ export default function Home() {
         }
         if (aboutRes.ok) {
           const aboutData = await aboutRes.json();
-          if (aboutData && aboutData.length > 0) {
-            setAboutImages(aboutData);
-          }
+          setAboutImages(aboutData);
         }
       } catch (err) {
         console.error("Failed to fetch data from API", err);
@@ -265,19 +263,24 @@ export default function Home() {
               initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={fadeInLeft}>
               
               <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', borderRadius: '24px', overflow: 'hidden' }}>
-                <AnimatePresence mode="wait">
-                  <motion.img 
-                    key={aboutImageIndex}
-                    src={aboutImages[aboutImageIndex]} 
-                    alt="Hawaii'n Delight Storefront" 
-                    loading="lazy" 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.8 }}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }}
-                  />
-                </AnimatePresence>
+                {aboutImages.length > 0 ? (
+                  aboutImages.map((src, index) => (
+                    <motion.img 
+                      key={src}
+                      src={src} 
+                      alt="Hawaii'n Delight Storefront" 
+                      loading={index === 0 ? "eager" : "lazy"} 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: index === aboutImageIndex ? 1 : 0 }}
+                      transition={{ duration: 0.8 }}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0, pointerEvents: index === aboutImageIndex ? 'auto' : 'none' }}
+                    />
+                  ))
+                ) : (
+                  <div style={{ width: '100%', height: '100%', background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 0, left: 0 }}>
+                    <span style={{ color: '#ccc' }}>No images available</span>
+                  </div>
+                )}
               </div>
 
 
