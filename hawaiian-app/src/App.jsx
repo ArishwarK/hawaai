@@ -195,11 +195,27 @@ function Footer() {
 function FloatingActions() {
   const { pathname } = useLocation();
   const [isHovered, setIsHovered] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   
+  // Auto-toggle tooltip: 5s visible, 5s hidden
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowTooltip(prev => !prev);
+    }, 5000);
+    // Start visible after a short delay
+    const initialTimeout = setTimeout(() => setShowTooltip(true), 1500);
+    return () => {
+      clearInterval(interval);
+      clearTimeout(initialTimeout);
+    };
+  }, []);
+
   // Hide the WhatsApp button on the admin page
   if (pathname.startsWith('/admin') || pathname === '/login') {
     return null;
   }
+
+  const isVisible = showTooltip || isHovered;
 
   return (
     <div 
@@ -212,8 +228,8 @@ function FloatingActions() {
         background: 'white', padding: '8px 14px', borderRadius: '12px', 
         boxShadow: '0 4px 12px rgba(0,0,0,0.15)', fontSize: '0.9rem', 
         fontWeight: 600, color: '#333',
-        opacity: isHovered ? 1 : 0,
-        transform: isHovered ? 'translateY(0)' : 'translateY(10px)',
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0)' : 'translateY(10px)',
         pointerEvents: 'none',
         transition: 'all 0.3s ease'
       }}>
