@@ -210,41 +210,7 @@ export default function Home() {
           style={{ position: 'absolute', bottom: '30%', right: '9%', width: 8, height: 8, borderRadius: '50%', background: 'rgba(174,230,249,0.9)', zIndex: 2, boxShadow: '0 0 12px rgba(174,230,249,0.6)' }}
         />
 
-        {/* Rating badge - top right */}
-        <style>{`
-          .rating-badge-wrapper {
-            position: absolute;
-            top: 90px;
-            right: 16px;
-            z-index: 5;
-          }
-          @media (max-width: 992px) {
-            .rating-badge-wrapper {
-              position: relative;
-              top: 0;
-              right: 0;
-              margin-top: 0px;
-              margin-bottom: 10px;
-              display: flex;
-              justify-content: center;
-              width: 100%;
-            }
-          }
-        `}</style>
-        <motion.div
-          className="rating-badge-wrapper"
-          initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5, duration: 0.6 }}
-        >
-          <div className="glass-panel" style={{ padding: '6px 10px', textAlign: 'center', background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px)', borderRadius: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}>
-            <div style={{ color: '#FACC15', marginBottom: '2px', display: 'flex', gap: '2px', justifyContent: 'center' }}>
-              {[1, 2, 3, 4, 5].map(i => (
-                <Star key={i} fill="currentColor" size={11} />
-              ))}
-            </div>
-            <p style={{ fontWeight: 700, fontSize: '0.65rem', margin: '0 0 2px 0', color: '#333' }}>Loved by Customers</p>
-            <p style={{ fontSize: '0.55rem', color: '#666', margin: 0 }}>Freshly Made • Premium Ingredients • Family Friendly</p>
-          </div>
-        </motion.div>
+
 
         {/* Hero content */}
         <div className="hero-content container text-center" style={{ position: 'relative', zIndex: 3 }}>
@@ -278,9 +244,6 @@ export default function Home() {
             style={{ marginTop: '20px', marginBottom: '16px' }}
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1, duration: 0.7 }}
           >
-            <h3 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.6rem)', fontWeight: 700, marginBottom: '16px', color: 'var(--charcoal)' }}>
-              Explore Our <span className="text-gradient">Varieties</span>
-            </h3>
             <div style={{ position: 'relative', maxWidth: '800px', margin: '0 auto', height: 'clamp(250px, 55vw, 450px)', borderRadius: 'clamp(16px, 4vw, 28px)', overflow: 'hidden', boxShadow: '0 16px 48px rgba(0,0,0,0.12)' }}>
               {menuCategories.length > 0 && activeCategory ? (
                 <>
@@ -354,6 +317,21 @@ export default function Home() {
                   Loading menu varieties...
                 </div>
               )}
+            </div>
+          </motion.div>
+
+          {/* Rating badge - bottom */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2, duration: 0.6 }}
+            style={{ display: 'flex', justifyContent: 'center', marginTop: '24px' }}
+          >
+            <div className="glass-panel" style={{ padding: '4px 12px', textAlign: 'center', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)', borderRadius: '99px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ color: '#FACC15', display: 'flex', gap: '2px' }}>
+                {[1, 2, 3, 4, 5].map(i => (
+                  <Star key={i} fill="currentColor" size={10} />
+                ))}
+              </div>
+              <span style={{ fontSize: '0.6rem', color: '#555', fontWeight: 600 }}>Loved by Customers</span>
             </div>
           </motion.div>
 
@@ -605,7 +583,6 @@ export default function Home() {
                       transition={{ delay: i * 0.1 }}
                       style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', background: 'white', padding: '24px', borderRadius: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}
                     >
-                      <div style={{ fontSize: '2.5rem' }}>{offer.icon}</div>
                       <div>
                         <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--charcoal)', marginBottom: '4px' }}>{offer.title}</h4>
                         <p style={{ color: '#666', fontSize: '1rem', lineHeight: 1.5 }}>{offer.desc}</p>

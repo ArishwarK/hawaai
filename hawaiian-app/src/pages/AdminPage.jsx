@@ -660,7 +660,7 @@ export default function AdminPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>🎁 Offers</h3>
                   <button
-                    onClick={() => setVibeConfig({ ...vibeConfig, offers: [...vibeConfig.offers, { icon: '🎁', title: '', desc: '' }] })}
+                    onClick={() => setVibeConfig({ ...vibeConfig, offers: [...vibeConfig.offers, { title: '', desc: '' }] })}
                     style={{ padding: '6px 14px', borderRadius: '10px', border: 'none', background: '#fce7f3', color: '#9d174d', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}
                   >+ Add Offer</button>
                 </div>
@@ -668,16 +668,6 @@ export default function AdminPage() {
                   {vibeConfig.offers.map((offer, i) => (
                     <div key={i} style={{ background: 'white', borderRadius: '12px', padding: '12px', border: '1px solid #eee' }}>
                       <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                        <input
-                          value={offer.icon}
-                          onChange={(e) => {
-                            const updated = [...vibeConfig.offers];
-                            updated[i] = { ...updated[i], icon: e.target.value };
-                            setVibeConfig({ ...vibeConfig, offers: updated });
-                          }}
-                          placeholder="Icon"
-                          style={{ width: '48px', minWidth: '48px', padding: '8px', borderRadius: '10px', border: '1px solid #eee', textAlign: 'center', fontSize: '1.2rem', outline: 'none', boxSizing: 'border-box' }}
-                        />
                         <input
                           value={offer.title}
                           onChange={(e) => {
