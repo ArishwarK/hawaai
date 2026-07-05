@@ -123,6 +123,16 @@ export default function AdminPage() {
   const [menu, setMenu] = useState(null);
   const [reels, setReels] = useState([]);
   const [aboutImages, setAboutImages] = useState([]);
+  const [vibeConfig, setVibeConfig] = useState({
+    reviews_pid: '4ff91ea4-3ae6-4fa5-b7d0-73da36500483',
+    best_sellers: ['Cookie Wave Bubble Tea', 'Classic Veg Sandwich', 'Volcano Veg/Crispy Chicken Burger', 'Volcano Fries', 'Brownie with Ice Cream'],
+    offers: [
+      { icon: '🍩', title: 'Mochi Donut 50% OFF', desc: 'Limited-time offer on all donuts!' },
+      { icon: '🎉', title: 'Birthday Special', desc: 'Celebrate with exclusive treats on your birthday.' },
+      { icon: '🍹', title: 'Combo Meals', desc: 'Enjoy your favorite tropical combos at special prices.' },
+      { icon: '🎓', title: 'Student Discount - 10% OFF', desc: 'Get 10% OFF on your bill with a valid student ID.' }
+    ]
+  });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
@@ -135,6 +145,7 @@ export default function AdminPage() {
   const [editingCategoryData, setEditingCategoryData] = useState(null);
   const [showEditItem, setShowEditItem] = useState(false);
   const [editingItemData, setEditingItemData] = useState(null); // { catId, index, name, price, desc }
+  const [vibeActiveBlock, setVibeActiveBlock] = useState(null);
   const { token, logout: authLogout } = useAuth();
   const { refreshMenu } = useMenuContext();
 
@@ -161,10 +172,11 @@ export default function AdminPage() {
     setLoading(true);
     setErrorDetails(null);
     try {
-      const [menuRes, reelsRes, aboutRes] = await Promise.all([
+      const [menuRes, reelsRes, aboutRes, vibeRes] = await Promise.all([
         fetch(`/api/menu?cb=${Date.now()}`),
         fetch('/api/reels'),
-        fetch('/api/about-images')
+        fetch('/api/about-images'),
+        fetch('/api/vibe')
       ]);
 
       
@@ -174,6 +186,7 @@ export default function AdminPage() {
       const menuData = await menuRes.json();
       const reelsData = await reelsRes.json();
       const aboutData = aboutRes.ok ? await aboutRes.json() : [];
+      const vibeData = vibeRes.ok ? await vibeRes.json() : null;
 
       if (menuData) setMenu(menuData);
       if (reelsData) {
@@ -181,6 +194,9 @@ export default function AdminPage() {
       }
       if (aboutData) {
         setAboutImages(aboutData.map(url => ({ id: Math.random().toString(36).substr(2, 9), url })));
+      }
+      if (vibeData) {
+        setVibeConfig(vibeData);
       }
     } catch (err) {
       console.error("Failed to fetch data from API", err);
@@ -217,8 +233,13 @@ export default function AdminPage() {
         body: JSON.stringify(aboutImages.map(img => img.url).filter(url => url.trim() !== ""))
       });
 
+      const vibeRes = await fetch('/api/vibe', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(vibeConfig)
+      });
 
-      if (menuRes.ok && reelsRes.ok && aboutRes.ok) {
+      if (menuRes.ok && reelsRes.ok && aboutRes.ok && vibeRes.ok) {
         setMessage({ type: 'success', text: 'All changes saved to database!' });
         // Refetch the latest data to update UI
         await fetchData();
@@ -515,61 +536,179 @@ export default function AdminPage() {
 
 
 
-        {/* Reels Editor */}
+        {/* Catch the Vibe Config - Unified 4-Block Editor */}
         {!selectedCategory && (
           <div className="admin-card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h2 style={{ fontSize: '1.3rem', fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
-                🎬 Instagram Reels
-              </h2>
-              <button 
-                onClick={addReel}
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  background: '#e3f2fd',
-                  color: '#1976d2',
-                  fontWeight: 700,
-                  fontSize: '0.8rem',
-                  cursor: 'pointer'
-                }}
-              >
-                + Add Reel
-              </button>
-            </div>
-            <div className="reels-grid">
-              {reels.map((id, idx) => (
-                <div key={idx} style={{ position: 'relative' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#888', textTransform: 'uppercase' }}>Reel {idx + 1}</label>
-                    <button 
-                      onClick={() => deleteReel(idx)}
-                      style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1rem', color: '#ff4d4d', opacity: 0.6 }}
-                      onMouseEnter={(e) => e.target.style.opacity = 1}
-                      onMouseLeave={(e) => e.target.style.opacity = 0.6}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                  <input 
-                    value={id}
-                    onChange={(e) => {
-                      const newReels = [...reels];
-                      newReels[idx] = e.target.value;
-                      setReels(newReels);
-                    }}
-                    placeholder="Enter Reel ID (e.g. C1a2b3c4d5e)"
-                    style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #eee', fontSize: '0.9rem', outline: 'none', background: '#fcfcfc' }}
-                    onFocus={(e) => e.target.style.borderColor = 'var(--tropical-pink)'}
-                    onBlur={(e) => e.target.style.borderColor = '#eee'}
-                  />
+            <h2 style={{ fontSize: '1.3rem', fontWeight: 800, margin: '0 0 24px 0', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              🌴 Catch the Vibe Config
+            </h2>
+
+            {/* 4 Clickable Block Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: vibeActiveBlock ? '24px' : '0' }}>
+              {[
+                { key: 'insta', icon: '📸', label: 'Instagram Feed', bg: '#f8f9ff', count: `${reels.length} Reels` },
+                { key: 'reviews', icon: '⭐', label: 'Customer Reviews', bg: '#fff8f0', count: 'Widget PID' },
+                { key: 'sellers', icon: '🌟', label: 'Best Sellers', bg: '#f0fff4', count: `${vibeConfig.best_sellers.length} Items` },
+                { key: 'offers', icon: '🎁', label: 'Offers', bg: '#fff0f9', count: `${vibeConfig.offers.length} Offers` }
+              ].map(block => (
+                <div
+                  key={block.key}
+                  onClick={() => setVibeActiveBlock(vibeActiveBlock === block.key ? null : block.key)}
+                  style={{
+                    background: vibeActiveBlock === block.key ? 'var(--tropical-pink)' : block.bg,
+                    color: vibeActiveBlock === block.key ? 'white' : 'var(--charcoal)',
+                    borderRadius: '16px',
+                    padding: '20px',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    border: vibeActiveBlock === block.key ? '2px solid var(--tropical-pink)' : '2px solid transparent',
+                    textAlign: 'center'
+                  }}
+                >
+                  <div style={{ fontSize: '2rem', marginBottom: '8px' }}>{block.icon}</div>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: 800, margin: '0 0 4px 0' }}>{block.label}</h3>
+                  <p style={{ fontSize: '0.75rem', margin: 0, opacity: 0.7 }}>{block.count}</p>
                 </div>
               ))}
-              {reels.length === 0 && (
-                <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#aaa', padding: '20px', margin: 0 }}>No reels added yet. Click "+ Add Reel" to begin.</p>
-              )}
             </div>
+
+            {/* Expanded Editor for Instagram Feed */}
+            {vibeActiveBlock === 'insta' && (
+              <div style={{ background: '#f8f9ff', borderRadius: '16px', padding: '20px', marginTop: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>📸 Instagram Reels</h3>
+                  <button
+                    onClick={addReel}
+                    style={{ padding: '6px 14px', borderRadius: '10px', border: 'none', background: '#e3f2fd', color: '#1976d2', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}
+                  >+ Add Reel</button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
+                  {reels.map((id, idx) => (
+                    <div key={idx} style={{ display: 'flex', gap: '8px', alignItems: 'center', background: '#fff', padding: '8px', borderRadius: '12px', border: '1px solid #eee' }}>
+                      <input
+                        value={id}
+                        onChange={(e) => {
+                          const newReels = [...reels];
+                          newReels[idx] = e.target.value;
+                          setReels(newReels);
+                        }}
+                        placeholder={`Reel ${idx + 1} ID`}
+                        style={{ flex: 1, minWidth: 0, padding: '8px', borderRadius: '8px', border: 'none', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', background: 'transparent' }}
+                      />
+                      <button
+                        onClick={() => deleteReel(idx)}
+                        style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#ff4d4d', padding: '0 4px' }}
+                      >🗑️</button>
+                    </div>
+                  ))}
+                  {reels.length === 0 && (
+                    <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#aaa', padding: '20px', margin: 0 }}>No reels added yet.</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Expanded Editor for Customer Reviews */}
+            {vibeActiveBlock === 'reviews' && (
+              <div style={{ background: '#fff8f0', borderRadius: '16px', padding: '20px', marginTop: '16px' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '12px', margin: '0 0 12px 0' }}>⭐ Customer Reviews</h3>
+                <input
+                  value={vibeConfig.reviews_pid}
+                  onChange={(e) => setVibeConfig({ ...vibeConfig, reviews_pid: e.target.value })}
+                  placeholder="Common Ninja Widget PID"
+                  style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #eee', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+            )}
+
+            {/* Expanded Editor for Best Sellers */}
+            {vibeActiveBlock === 'sellers' && (
+              <div style={{ background: '#f0fff4', borderRadius: '16px', padding: '20px', marginTop: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>🌟 Best Sellers</h3>
+                  <button
+                    onClick={() => setVibeConfig({ ...vibeConfig, best_sellers: [...vibeConfig.best_sellers, ''] })}
+                    style={{ padding: '6px 14px', borderRadius: '10px', border: 'none', background: '#dcfce7', color: '#166534', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}
+                  >+ Add Item</button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
+                  {vibeConfig.best_sellers.map((item, i) => (
+                    <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <input
+                        value={item}
+                        onChange={(e) => {
+                          const updated = [...vibeConfig.best_sellers];
+                          updated[i] = e.target.value;
+                          setVibeConfig({ ...vibeConfig, best_sellers: updated });
+                        }}
+                        placeholder="Item name"
+                        style={{ flex: 1, minWidth: 0, padding: '10px', borderRadius: '10px', border: '1px solid #eee', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box' }}
+                      />
+                      <button
+                        onClick={() => setVibeConfig({ ...vibeConfig, best_sellers: vibeConfig.best_sellers.filter((_, j) => j !== i) })}
+                        style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ff4d4d', fontSize: '1.1rem', padding: '0 4px' }}
+                      >🗑️</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Expanded Editor for Offers */}
+            {vibeActiveBlock === 'offers' && (
+              <div style={{ background: '#fff0f9', borderRadius: '16px', padding: '20px', marginTop: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>🎁 Offers</h3>
+                  <button
+                    onClick={() => setVibeConfig({ ...vibeConfig, offers: [...vibeConfig.offers, { icon: '🎁', title: '', desc: '' }] })}
+                    style={{ padding: '6px 14px', borderRadius: '10px', border: 'none', background: '#fce7f3', color: '#9d174d', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}
+                  >+ Add Offer</button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px' }}>
+                  {vibeConfig.offers.map((offer, i) => (
+                    <div key={i} style={{ background: 'white', borderRadius: '12px', padding: '12px', border: '1px solid #eee' }}>
+                      <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                        <input
+                          value={offer.icon}
+                          onChange={(e) => {
+                            const updated = [...vibeConfig.offers];
+                            updated[i] = { ...updated[i], icon: e.target.value };
+                            setVibeConfig({ ...vibeConfig, offers: updated });
+                          }}
+                          placeholder="Icon"
+                          style={{ width: '48px', minWidth: '48px', padding: '8px', borderRadius: '10px', border: '1px solid #eee', textAlign: 'center', fontSize: '1.2rem', outline: 'none', boxSizing: 'border-box' }}
+                        />
+                        <input
+                          value={offer.title}
+                          onChange={(e) => {
+                            const updated = [...vibeConfig.offers];
+                            updated[i] = { ...updated[i], title: e.target.value };
+                            setVibeConfig({ ...vibeConfig, offers: updated });
+                          }}
+                          placeholder="Offer title"
+                          style={{ flex: 1, minWidth: 0, padding: '8px', borderRadius: '10px', border: '1px solid #eee', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box' }}
+                        />
+                        <button
+                          onClick={() => setVibeConfig({ ...vibeConfig, offers: vibeConfig.offers.filter((_, j) => j !== i) })}
+                          style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ff4d4d', fontSize: '1.1rem', padding: '0 4px' }}
+                        >🗑️</button>
+                      </div>
+                      <input
+                        value={offer.desc}
+                        onChange={(e) => {
+                          const updated = [...vibeConfig.offers];
+                          updated[i] = { ...updated[i], desc: e.target.value };
+                          setVibeConfig({ ...vibeConfig, offers: updated });
+                        }}
+                        placeholder="Description"
+                        style={{ width: '100%', padding: '8px', borderRadius: '10px', border: '1px solid #eee', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
           </div>
         )}
 

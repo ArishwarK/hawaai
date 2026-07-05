@@ -47,6 +47,17 @@ export default function Home() {
   const [reels, setReels] = useState(["DWyeM0BTA6h", "DWqwIDugU1G", "DRzRwqZAToa", "DQwJY-IAS8D"]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedReel, setSelectedReel] = useState(null);
+  const [activeVibeTab, setActiveVibeTab] = useState('Instagram Feed');
+  const [vibeConfig, setVibeConfig] = useState({
+    reviews_pid: '4ff91ea4-3ae6-4fa5-b7d0-73da36500483',
+    best_sellers: ['Cookie Wave Bubble Tea', 'Classic Veg Sandwich', 'Volcano Veg/Crispy Chicken Burger', 'Volcano Fries', 'Brownie with Ice Cream'],
+    offers: [
+      { icon: '🍩', title: 'Mochi Donut 50% OFF', desc: 'Limited-time offer on all donuts!' },
+      { icon: '🎉', title: 'Birthday Special', desc: 'Celebrate with exclusive treats on your birthday.' },
+      { icon: '🍹', title: 'Combo Meals', desc: 'Enjoy your favorite tropical combos at special prices.' },
+      { icon: '🎓', title: 'Student Discount - 10% OFF', desc: 'Get 10% OFF on your bill with a valid student ID.' }
+    ]
+  });
   
   const [aboutImageIndex, setAboutImageIndex] = useState(0);
   const [aboutImages, setAboutImages] = useState([]);
@@ -70,9 +81,10 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [reelsRes, aboutRes] = await Promise.all([
+        const [reelsRes, aboutRes, vibeRes] = await Promise.all([
           fetch('/api/reels'),
-          fetch('/api/about-images')
+          fetch('/api/about-images'),
+          fetch('/api/vibe')
         ]);
         
         if (reelsRes.ok) {
@@ -83,12 +95,30 @@ export default function Home() {
           const aboutData = await aboutRes.json();
           setAboutImages(aboutData);
         }
+        if (vibeRes.ok) {
+          const vibeData = await vibeRes.json();
+          setVibeConfig(vibeData);
+        }
       } catch (err) {
         console.error("Failed to fetch data from API", err);
       }
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (activeVibeTab === 'Customer Reviews') {
+      const script = document.createElement('script');
+      script.src = "https://cdn.commoninja.com/sdk/latest/commonninja.js";
+      script.defer = true;
+      document.body.appendChild(script);
+      return () => {
+        if (document.body.contains(script)) {
+          document.body.removeChild(script);
+        }
+      };
+    }
+  }, [activeVibeTab]);
 
   const nextSlide = () => {
     if (menuCategories.length === 0) return;
@@ -180,39 +210,45 @@ export default function Home() {
           style={{ position: 'absolute', bottom: '30%', right: '9%', width: 8, height: 8, borderRadius: '50%', background: 'rgba(174,230,249,0.9)', zIndex: 2, boxShadow: '0 0 12px rgba(174,230,249,0.6)' }}
         />
 
+        {/* Rating badge - top right */}
+        <style>{`
+          .rating-badge-wrapper {
+            position: absolute;
+            top: 90px;
+            right: 16px;
+            z-index: 5;
+          }
+          @media (max-width: 992px) {
+            .rating-badge-wrapper {
+              position: relative;
+              top: 0;
+              right: 0;
+              margin-top: 0px;
+              margin-bottom: 10px;
+              display: flex;
+              justify-content: center;
+              width: 100%;
+            }
+          }
+        `}</style>
+        <motion.div
+          className="rating-badge-wrapper"
+          initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5, duration: 0.6 }}
+        >
+          <div className="glass-panel" style={{ padding: '6px 10px', textAlign: 'center', background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px)', borderRadius: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}>
+            <div style={{ color: '#FACC15', marginBottom: '2px', display: 'flex', gap: '2px', justifyContent: 'center' }}>
+              {[1, 2, 3, 4, 5].map(i => (
+                <Star key={i} fill="currentColor" size={11} />
+              ))}
+            </div>
+            <p style={{ fontWeight: 700, fontSize: '0.65rem', margin: '0 0 2px 0', color: '#333' }}>Loved by Customers</p>
+            <p style={{ fontSize: '0.55rem', color: '#666', margin: 0 }}>Freshly Made • Premium Ingredients • Family Friendly</p>
+          </div>
+        </motion.div>
+
         {/* Hero content */}
         <div className="hero-content container text-center" style={{ position: 'relative', zIndex: 3 }}>
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={{ visible: { transition: { staggerChildren: 0.12, delayChildren: 0.3 } } }}
-            style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center' }}
-          >
-            <motion.div
-              variants={scaleIn}
-              style={{
-                background: 'transparent',
-                padding: 'clamp(10px, 2.5vw, 16px) clamp(16px, 5vw, 32px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                maxWidth: '240px',
-                margin: '0 auto'
-              }}
-            >
-              <img
-                src="/logo.png"
-                alt="Hawaii'n Delight"
-                fetchpriority="high"
-                style={{
-                  height: 'clamp(70px, 14vw, 110px)',
-                  width: 'auto',
-                  maxWidth: '100%',
-                  objectFit: 'contain'
-                }}
-              />
-            </motion.div>
-          </motion.div>
+
 
           <motion.h1
             className="hero-title"
@@ -226,52 +262,105 @@ export default function Home() {
             style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)', color: '#444', fontWeight: 600, marginBottom: '16px', maxWidth: '600px', marginInline: 'auto' }}
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 0.7 }}
           >
-            Island-Inspired Bites, Sips & Sweet Delights
+            Coimbatore's Home of Island-Inspired Bites, Sips & Desserts
           </motion.p>
           
           <motion.p
             style={{ fontSize: 'clamp(0.85rem, 2.5vw, 1.1rem)', color: '#666', fontWeight: 500, marginBottom: '32px', maxWidth: '700px', marginInline: 'auto' }}
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0, duration: 0.7 }}
           >
-            Bubble Tea • Burgers • Sandwiches • Shaved Ice • Mochi Donuts • Desserts
+            Bubble Tea • Hawaiian Shaved Ice • Mochi Donuts • Burgers • Sandwiches • Bites & Dessert
           </motion.p>
 
 
+          {/* Explore Our Varieties - Product Slider */}
           <motion.div
-            style={{ marginBottom: '32px', display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'nowrap' }}
+            style={{ marginTop: '20px', marginBottom: '16px' }}
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1, duration: 0.7 }}
           >
-            <motion.a href="#visit" className="primary-btn" 
-              style={{ fontSize: 'clamp(0.75rem, 3vw, 1rem)', padding: '10px 0', width: 'clamp(110px, 35vw, 140px)', flexShrink: 0 }}
-              whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}
-            >Visit Us Today</motion.a>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
-              <Link to="/menu" className="secondary-btn" 
-                style={{ fontSize: 'clamp(0.75rem, 3vw, 1rem)', padding: '10px 0', width: 'clamp(110px, 35vw, 140px)', flexShrink: 0, display: 'inline-block' }}
-              >View Menu</Link>
-            </motion.div>
-          </motion.div>
-
-          {/* Rating badge */}
-          <motion.div
-            className="glass-panel rating-badge mx-auto"
-            style={{ display: 'inline-flex', flexDirection: 'column', padding: '10px 20px' }}
-            initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 1.4, duration: 0.6, type: 'spring', stiffness: 120 }}
-          >
-            <div className="flex justify-center gap-1 mb-1" style={{ color: '#FACC15', marginBottom: '2px' }}>
-              {[1, 2, 3, 4, 5].map(i => (
-                <motion.div key={i} initial={{ opacity: 0, rotate: -30 }} animate={{ opacity: 1, rotate: 0 }} transition={{ delay: 1.6 + i * 0.08 }}>
-                  <Star fill="currentColor" size={14} />
-                </motion.div>
-              ))}
+            <h3 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.6rem)', fontWeight: 700, marginBottom: '16px', color: 'var(--charcoal)' }}>
+              Explore Our <span className="text-gradient">Varieties</span>
+            </h3>
+            <div style={{ position: 'relative', maxWidth: '800px', margin: '0 auto', height: 'clamp(250px, 55vw, 450px)', borderRadius: 'clamp(16px, 4vw, 28px)', overflow: 'hidden', boxShadow: '0 16px 48px rgba(0,0,0,0.12)' }}>
+              {menuCategories.length > 0 && activeCategory ? (
+                <>
+                  <AnimatePresence initial={false}>
+                    <motion.div
+                      key={currentIndex}
+                      initial={{ opacity: 0, x: '100%', scale: 1.1 }}
+                      animate={{ opacity: 1, x: 0, scale: 1 }}
+                      exit={{ opacity: 0, x: '-100%', scale: 0.9 }}
+                      transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
+                      style={{ width: '100%', height: '100%', position: 'absolute' }}
+                    >
+                      <Link to={`/menu/${activeCategory.id}`} style={{ display: 'block', width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
+                        <motion.img
+                          src={activeCategory.image}
+                          alt={activeCategory.label}
+                          fetchpriority="high"
+                          onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1558857563-b37103ebced1?auto=format&fit=crop&q=80'; }}
+                          animate={{ scale: [1, 1.15] }}
+                          transition={{ duration: 6, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer', objectPosition: 'center center' }}
+                        />
+                        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '60px 16px 16px', background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)', color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', pointerEvents: 'none' }}>
+                          <motion.h3
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                            style={{ fontSize: 'clamp(1.4rem, 6vw, 2.2rem)', fontWeight: 800, textShadow: '0 2px 10px rgba(0,0,0,0.3)', margin: 0, textAlign: 'center', lineHeight: 1.1, paddingBottom: '12px' }}
+                          >
+                            {activeCategory.label}
+                          </motion.h3>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  </AnimatePresence>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); prevSlide(); }}
+                    style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', width: 'clamp(36px, 9vw, 52px)', height: 'clamp(36px, 9vw, 52px)', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.3)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.3s', zIndex: 10 }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--tropical-pink)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; }}
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); nextSlide(); }}
+                    style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', width: 'clamp(36px, 9vw, 52px)', height: 'clamp(36px, 9vw, 52px)', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.3)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.3s', zIndex: 10 }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--tropical-pink)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; }}
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                  <div style={{ position: 'absolute', bottom: '14px', left: '50%', transform: 'translateX(-50%)', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '90%', gap: 'clamp(3px, 1.2vw, 6px)', zIndex: 10 }}>
+                    {menuCategories.map((_, i) => (
+                      <div
+                        key={i}
+                        onClick={() => setCurrentIndex(i)}
+                        style={{
+                          width: i === currentIndex ? 'clamp(14px, 4vw, 28px)' : 'clamp(5px, 1.2vw, 7px)',
+                          height: 'clamp(5px, 1.2vw, 7px)',
+                          borderRadius: '4px',
+                          background: i === currentIndex ? 'var(--tropical-pink)' : 'rgba(255,255,255,0.5)',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s'
+                        }}
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#888', background: '#f9f9f9' }}>
+                  Loading menu varieties...
+                </div>
+              )}
             </div>
-            <p style={{ fontWeight: 600, fontSize: '0.8rem' }}><strong>4.8 Rating</strong> | Loved by Customers</p>
           </motion.div>
 
           {/* Scroll indicator */}
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: 0.8 }}
-            style={{ marginTop: '48px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: '#666' }}
+            style={{ marginTop: '32px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', color: '#666' }}
           >
             <span style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Scroll Down</span>
             <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
@@ -283,7 +372,7 @@ export default function Home() {
 
 
       
-      {/* 🏝 ABOUT SECTION */}
+      {/* 🌴 ABOUT SECTION */}
       <section className="section" id="about">
         <div className="container">
           <div className="grid-2">
@@ -342,269 +431,194 @@ export default function Home() {
         </div>
       </section>
 
+      {/* 📸 CATCH THE VIBE SECTION */}
+      <section className="section container" style={{ padding: '80px 0' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+          
+          <div style={{ flex: 1 }}>
+            <div className="text-center" style={{ marginBottom: '40px' }}>
+              {/* Removed Catch the Vibe section title */}
+            </div>
+            
+            {/* Tabs List */}
+            <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '16px', borderBottom: '2px solid #eee', marginBottom: '32px' }}>
+              {['Instagram Feed', 'Best Sellers', 'Offers'].map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveVibeTab(tab)}
+                  style={{
+                    background: activeVibeTab === tab ? 'var(--tropical-pink)' : 'transparent',
+                    color: activeVibeTab === tab ? 'white' : '#666',
+                    border: 'none',
+                    padding: '8px 24px',
+                    borderRadius: '99px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
 
-
-      {/* 🍵 SLIDESHOW MENU SECTION */}
-      <section className="section" style={{ background: 'var(--white)', overflow: 'hidden' }}>
-        <div className="container">
-          <div className="text-center" style={{ marginBottom: '48px' }}>
-            <motion.h2 className="section-title" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-              Explore Our <span className="text-gradient">Varieties</span>
-            </motion.h2>
-          </div>
-
-          <div style={{ position: 'relative', maxWidth: '1000px', margin: '0 auto', height: 'clamp(320px, 60vw, 600px)', borderRadius: 'clamp(20px, 5vw, 40px)', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.1)' }}>
-            {menuCategories.length > 0 && activeCategory ? (
-              <>
-                <AnimatePresence initial={false}>
-                  <motion.div
-                    key={currentIndex}
-                    initial={{ opacity: 0, x: '100%', scale: 1.1 }}
-                    animate={{ opacity: 1, x: 0, scale: 1 }}
-                    exit={{ opacity: 0, x: '-100%', scale: 0.9 }}
-                    transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
-                    style={{ width: '100%', height: '100%', position: 'absolute' }}
+            {/* Tab Contents */}
+            <div>
+              {activeVibeTab === 'Instagram Feed' && (
+                <div style={{ position: 'relative', marginTop: '20px' }}>
+                  <div 
+                    id="reels-scroll-container"
+                    style={{ 
+                      display: 'flex', 
+                      gap: '24px', 
+                      overflowX: 'auto', 
+                      padding: '24px 0',
+                      scrollSnapType: 'x mandatory',
+                      scrollBehavior: 'smooth',
+                      scrollbarWidth: 'none',
+                      msOverflowStyle: 'none',
+                      WebkitOverflowScrolling: 'touch'
+                    }}
                   >
-                    <Link to={`/menu/${activeCategory.id}`} style={{ display: 'block', width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
-                      <motion.img
-                        src={activeCategory.image}
-                        alt={activeCategory.label}
-                        fetchpriority="high"
-                        onError={(e) => { 
-                          e.target.onerror = null; 
-                          e.target.src = 'https://images.unsplash.com/photo-1558857563-b37103ebced1?auto=format&fit=crop&q=80'; 
+                    {/* Dynamically managed reels from the dashboard */}
+                    {reels.map((reelId, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: i * 0.1 }}
+                        onClick={() => setSelectedReel(reelId)}
+                        style={{
+                          minWidth: 'clamp(180px, 50vw, 240px)',
+                          width: 'clamp(180px, 50vw, 240px)',
+                          height: 'clamp(320px, 55vh, 420px)',
+                          scrollSnapAlign: 'center',
+                          flexShrink: 0,
+                          overflow: 'hidden',
+                          borderRadius: '24px',
+                          position: 'relative',
+                          cursor: 'pointer',
+                          background: '#000',
+                          boxShadow: '0 12px 32px rgba(0,0,0,0.15)'
                         }}
-                        animate={{ scale: [1, 1.15] }}
-                        transition={{ duration: 6, ease: "linear", repeat: Infinity, repeatType: "reverse" }}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer', objectPosition: 'center center' }}
-                      />
-                      {/* Text Overlay */}
-                      <div style={{
-                        position: 'absolute',
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        padding: '80px 20px 20px',
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)',
-                        color: 'white',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        pointerEvents: 'none'
-                      }}>
-                        <motion.h3
-                          initial={{ y: 20, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: 0.3 }}
-                          style={{ fontSize: 'clamp(1.8rem, 8vw, 3rem)', fontWeight: 800, textShadow: '0 2px 10px rgba(0,0,0,0.3)', margin: 0, textAlign: 'center', lineHeight: 1.1, paddingBottom: '16px' }}
+                      >
+                        {/* Peek Iframe (Shows the real starting image) */}
+                        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: '#000' }}>
+                          <iframe
+                            title={`peek-${i}`}
+                            src={`https://www.instagram.com/reel/${reelId}/embed/?hidecaption=1`}
+                            frameBorder="0"
+                            scrolling="no"
+                            style={{
+                              width: '100%',
+                              height: '110%', 
+                              border: 'none',
+                              transform: 'translateY(-5%)'
+                            }}
+                          />
+                        </div>
+
+                        {/* Interaction Overlay */}
+                        <div 
+                          style={{
+                            position: 'absolute',
+                            inset: 0,
+                            zIndex: 2,
+                            background: 'rgba(0,0,0,0.05)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'background 0.3s'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.15)'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.05)'}
                         >
-                          {activeCategory.label}
-                        </motion.h3>
-                      </div>
-                    </Link>
-                  </motion.div>
-                </AnimatePresence>
+                          <div style={{ 
+                            width: '60px', 
+                            height: '60px', 
+                            borderRadius: '50%', 
+                            background: 'rgba(255,255,255,0.3)', 
+                            backdropFilter: 'blur(10px)', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            border: '1.5px solid rgba(255,255,255,0.5)',
+                            boxShadow: '0 8px 20px rgba(0,0,0,0.2)'
+                          }}>
+                            <div style={{ 
+                              width: 0, 
+                              height: 0, 
+                              borderTop: '12px solid transparent', 
+                              borderBottom: '12px solid transparent', 
+                              borderLeft: '18px solid white', 
+                              marginLeft: '6px' 
+                            }}></div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
 
-                {/* Navigation Arrows */}
-                <button
-                  onClick={(e) => { e.stopPropagation(); prevSlide(); }}
-                  style={{
-                    position: 'absolute',
-                    left: '16px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'rgba(255,255,255,0.2)',
-                    backdropFilter: 'blur(10px)',
-                    width: 'clamp(44px, 10vw, 64px)',
-                    height: 'clamp(44px, 10vw, 64px)',
-                    borderRadius: '50%',
-                    border: '1px solid rgba(255,255,255,0.3)',
-                    color: 'white',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s',
-                    zIndex: 10
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--tropical-pink)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; }}
-                >
-                  <ChevronLeft size={24} />
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); nextSlide(); }}
-                  style={{
-                    position: 'absolute',
-                    right: '16px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'rgba(255,255,255,0.2)',
-                    backdropFilter: 'blur(10px)',
-                    width: 'clamp(44px, 10vw, 64px)',
-                    height: 'clamp(44px, 10vw, 64px)',
-                    borderRadius: '50%',
-                    border: '1px solid rgba(255,255,255,0.3)',
-                    color: 'white',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s',
-                    zIndex: 10
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--tropical-pink)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; }}
-                >
-                  <ChevronRight size={24} />
-                </button>
+                  {/* Navigation Arrows */}
+                  <button 
+                    onClick={() => document.getElementById('reels-scroll-container').scrollBy({ left: -324, behavior: 'smooth' })}
+                    style={{ position: 'absolute', left: '-20px', top: '50%', transform: 'translateY(-50%)', width: '50px', height: '50px', borderRadius: '50%', background: 'white', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
+                  >
+                    <ChevronLeft size={24} color="var(--charcoal)" />
+                  </button>
+                  <button 
+                    onClick={() => document.getElementById('reels-scroll-container').scrollBy({ left: 324, behavior: 'smooth' })}
+                    style={{ position: 'absolute', right: '-20px', top: '50%', transform: 'translateY(-50%)', width: '50px', height: '50px', borderRadius: '50%', background: 'white', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
+                  >
+                    <ChevronRight size={24} color="var(--charcoal)" />
+                  </button>
+                </div>
+              )}
 
-                {/* Pagination Dots */}
-                <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '90%', gap: 'clamp(4px, 1.5vw, 8px)', zIndex: 10 }}>
-                  {menuCategories.map((_, i) => (
-                    <div
-                      key={i}
-                      onClick={() => setCurrentIndex(i)}
-                      style={{
-                        width: i === currentIndex ? 'clamp(16px, 5vw, 32px)' : 'clamp(6px, 1.5vw, 8px)',
-                        height: 'clamp(6px, 1.5vw, 8px)',
-                        borderRadius: '4px',
-                        background: i === currentIndex ? 'var(--tropical-pink)' : 'rgba(255,255,255,0.5)',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s'
-                      }}
-                    />
+              {activeVibeTab === 'Best Sellers' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '600px', margin: '0 auto' }}>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--charcoal)', marginBottom: '16px' }}>★ Most Ordered</h3>
+                  {vibeConfig.best_sellers.map((item, i) => (
+                    <motion.div 
+                      key={i} 
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.1 }}
+                      style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'white', padding: '16px 24px', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}
+                    >
+                      <span style={{ color: 'var(--tropical-pink)' }}>★</span>
+                      <span style={{ fontWeight: 600, color: 'var(--charcoal)' }}>{item}</span>
+                    </motion.div>
                   ))}
                 </div>
-              </>
-            ) : (
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#888', background: '#f9f9f9' }}>
-                Loading menu varieties...
-              </div>
-            )}
+              )}
+
+              {activeVibeTab === 'Offers' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '800px', margin: '0 auto' }}>
+                  {vibeConfig.offers.map((offer, i) => (
+                    <motion.div 
+                      key={i} 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.1 }}
+                      style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', background: 'white', padding: '24px', borderRadius: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}
+                    >
+                      <div style={{ fontSize: '2.5rem' }}>{offer.icon}</div>
+                      <div>
+                        <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--charcoal)', marginBottom: '4px' }}>{offer.title}</h4>
+                        <p style={{ color: '#666', fontSize: '1rem', lineHeight: 1.5 }}>{offer.desc}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </section>
-
-      {/* 📸 INSTAGRAM REELS SECTION */}
-      <section className="section container" style={{ padding: '80px 0' }}>
-        <div className="text-center" style={{ marginBottom: '64px' }}>
-          <h2 className="section-title">Catch the <span className="text-gradient">Vibe</span></h2>
-          <p style={{ color: '#666', fontSize: '1.1rem' }}>See why everyone is talking about Hawaii'n Delight on Instagram!</p>
-        </div>
-
-        {/* Reels Container with Navigation */}
-        <div style={{ position: 'relative', marginTop: '40px' }}>
-          <div 
-            id="reels-scroll-container"
-            style={{ 
-              display: 'flex', 
-              gap: '24px', 
-              overflowX: 'auto', 
-              padding: '24px 0',
-              scrollSnapType: 'x mandatory',
-              scrollBehavior: 'smooth',
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              WebkitOverflowScrolling: 'touch'
-            }}
-          >
-            {/* Dynamically managed reels from the dashboard */}
-            {reels.map((reelId, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                onClick={() => setSelectedReel(reelId)}
-                style={{
-                  minWidth: 'clamp(180px, 50vw, 240px)',
-                  width: 'clamp(180px, 50vw, 240px)',
-                  height: 'clamp(320px, 55vh, 420px)',
-                  scrollSnapAlign: 'center',
-                  flexShrink: 0,
-                  overflow: 'hidden',
-                  borderRadius: '24px',
-                  position: 'relative',
-                  cursor: 'pointer',
-                  background: '#000',
-                  boxShadow: '0 12px 32px rgba(0,0,0,0.15)'
-                }}
-              >
-                {/* Peek Iframe (Shows the real starting image) */}
-                <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: '#000' }}>
-                  <iframe
-                    title={`peek-${i}`}
-                    src={`https://www.instagram.com/reel/${reelId}/embed/?hidecaption=1`}
-                    frameBorder="0"
-                    scrolling="no"
-                    style={{
-                      width: '100%',
-                      height: '110%', 
-                      border: 'none',
-                      transform: 'translateY(-5%)'
-                    }}
-                  />
-                </div>
-
-                {/* Interaction Overlay */}
-                <div 
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    zIndex: 2,
-                    background: 'rgba(0,0,0,0.05)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'background 0.3s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.15)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.05)'}
-                >
-                  <div style={{ 
-                    width: '60px', 
-                    height: '60px', 
-                    borderRadius: '50%', 
-                    background: 'rgba(255,255,255,0.3)', 
-                    backdropFilter: 'blur(10px)', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    border: '1.5px solid rgba(255,255,255,0.5)',
-                    boxShadow: '0 8px 20px rgba(0,0,0,0.2)'
-                  }}>
-                    <div style={{ 
-                      width: 0, 
-                      height: 0, 
-                      borderTop: '12px solid transparent', 
-                      borderBottom: '12px solid transparent', 
-                      borderLeft: '18px solid white', 
-                      marginLeft: '6px' 
-                    }}></div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Navigation Arrows */}
-          <button 
-            onClick={() => document.getElementById('reels-scroll-container').scrollBy({ left: -324, behavior: 'smooth' })}
-            style={{ position: 'absolute', left: '-20px', top: '50%', transform: 'translateY(-50%)', width: '50px', height: '50px', borderRadius: '50%', background: 'white', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
-          >
-            <ChevronLeft size={24} color="var(--charcoal)" />
-          </button>
-          <button 
-            onClick={() => document.getElementById('reels-scroll-container').scrollBy({ left: 324, behavior: 'smooth' })}
-            style={{ position: 'absolute', right: '-20px', top: '50%', transform: 'translateY(-50%)', width: '50px', height: '50px', borderRadius: '50%', background: 'white', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
-          >
-            <ChevronRight size={24} color="var(--charcoal)" />
-          </button>
-        </div>
-
-        {/* 🎬 REEL LIGHTBOX MODAL */}
+        
+        {/* REEL LIGHTBOX MODAL */}
         <AnimatePresence>
           {selectedReel && (
             <motion.div
@@ -678,9 +692,16 @@ export default function Home() {
             </motion.div>
           )}
         </AnimatePresence>
-
       </section>
 
+      {/* ⭐ CUSTOMER REVIEWS SECTION */}
+      <section className="section" style={{ padding: '40px 0 80px' }}>
+        <div className="container">
+          <div style={{ background: 'rgba(255,255,255,0.5)', borderRadius: '32px', padding: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.05)', maxWidth: '1000px', margin: '0 auto' }}>
+            <div className={`commonninja_component pid-${vibeConfig.reviews_pid}`}></div>
+          </div>
+        </div>
+      </section>
 
       {/* 📍 LOCATION SECTION */}
       <section id="visit" className="section location-sec" style={{ padding: '96px 0', background: 'var(--charcoal)', color: 'white' }}>

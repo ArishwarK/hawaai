@@ -108,29 +108,87 @@ def is_authenticated():
 
 def load_reels():
     rows = sb_get('reels', {'select': 'reel_id', 'order': 'id'})
-    return [r['reel_id'] for r in rows if r and 'reel_id' in r and not r['reel_id'].startswith('ABOUT_IMG:')]
+    return [r['reel_id'] for r in rows if r and 'reel_id' in r
+            and not r['reel_id'].startswith('ABOUT_IMG:')
+            and not r['reel_id'].startswith('VIBE_')]
 
 def load_about_images():
     rows = sb_get('reels', {'select': 'reel_id', 'order': 'id'})
     return [r['reel_id'].replace('ABOUT_IMG:', '') for r in rows if r and 'reel_id' in r and r['reel_id'].startswith('ABOUT_IMG:')]
 
-def save_reels(reels):
+def load_vibe_config():
+    rows = sb_get('reels', {'select': 'reel_id', 'order': 'id'})
+    best_sellers = []
+    offers = []
+    reviews_pid = '4ff91ea4-3ae6-4fa5-b7d0-73da36500483'
+    import json
+    for r in rows:
+        if not r or 'reel_id' not in r:
+            continue
+        v = r['reel_id']
+        if v.startswith('VIBE_REVIEWS_PID:'):
+            reviews_pid = v.replace('VIBE_REVIEWS_PID:', '')
+        elif v.startswith('VIBE_BEST_SELLER:'):
+            best_sellers.append(v.replace('VIBE_BEST_SELLER:', ''))
+        elif v.startswith('VIBE_OFFER:'):
+            try:
+                offers.append(json.loads(v.replace('VIBE_OFFER:', '')))
+            except:
+                pass
+    if not best_sellers:
+        best_sellers = ['Cookie Wave Bubble Tea', 'Classic Veg Sandwich',
+                        'Volcano Veg/Crispy Chicken Burger', 'Volcano Fries', 'Brownie with Ice Cream']
+    if not offers:
+        offers = [
+            {'icon': '\ud83e\udd69', 'title': 'Mochi Donut 50% OFF', 'desc': 'Limited-time offer on all donuts!'},
+            {'icon': '\ud83c\udf89', 'title': 'Birthday Special', 'desc': 'Celebrate with exclusive treats on your birthday.'},
+            {'icon': '\ud83c\udf79', 'title': 'Combo Meals', 'desc': 'Enjoy your favorite tropical combos at special prices.'},
+            {'icon': '\ud83c\udf93', 'title': 'Student Discount - 10% OFF', 'desc': 'Get 10% OFF on your bill with a valid student ID.'}
+        ]
+    return {'reviews_pid': reviews_pid, 'best_sellers': best_sellers, 'offers': offers}
+
+def save_vibe_config(config):
+    import json
+    existing_reels = load_reels()
     existing_about = load_about_images()
     sb_delete('reels', 'id', 'neq', '-1')
-    combined = reels + [f"ABOUT_IMG:{img}" for img in existing_about]
+    rows = ([{'reel_id': r} for r in existing_reels] +
+            [{'reel_id': f'ABOUT_IMG:{img}'} for img in existing_about])
+    pid = config.get('reviews_pid', '4ff91ea4-3ae6-4fa5-b7d0-73da36500483')
+    rows.append({'reel_id': f'VIBE_REVIEWS_PID:{pid}'})
+    for item in config.get('best_sellers', []):
+        rows.append({'reel_id': f'VIBE_BEST_SELLER:{item}'})
+    for offer in config.get('offers', []):
+        rows.append({'reel_id': f'VIBE_OFFER:{json.dumps(offer, ensure_ascii=False)}'})
+    if rows:
+        return sb_post('reels', rows)
+    return True
+
+def save_reels(reels):
+    existing_about = load_about_images()
+    existing_vibe = _load_raw_vibe_rows()
+    sb_delete('reels', 'id', 'neq', '-1')
+    combined = ([{'reel_id': r} for r in reels] +
+                [{'reel_id': f'ABOUT_IMG:{img}'} for img in existing_about] +
+                existing_vibe)
     if combined:
-        res = sb_post('reels', [{"reel_id": r} for r in combined])
-        return res
+        return sb_post('reels', combined)
     return True
 
 def save_about_images(images):
     existing_reels = load_reels()
+    existing_vibe = _load_raw_vibe_rows()
     sb_delete('reels', 'id', 'neq', '-1')
-    combined = existing_reels + [f"ABOUT_IMG:{img}" for img in images]
+    combined = ([{'reel_id': r} for r in existing_reels] +
+                [{'reel_id': f'ABOUT_IMG:{img}'} for img in images] +
+                existing_vibe)
     if combined:
-        res = sb_post('reels', [{"reel_id": r} for r in combined])
-        return res
+        return sb_post('reels', combined)
     return True
+
+def _load_raw_vibe_rows():
+    rows = sb_get('reels', {'select': 'reel_id', 'order': 'id'})
+    return [{'reel_id': r['reel_id']} for r in rows if r and 'reel_id' in r and r['reel_id'].startswith('VIBE_')]
 
 def load_menu():
     # Fetch categories and items from Supabase
@@ -306,6 +364,22 @@ def handle_about_images():
             return jsonify({"error": str(e)}), 500
             
     return jsonify(load_about_images())
+
+@app.route('/api/vibe', methods=['GET', 'POST'])
+def handle_vibe():
+    if request.method == 'POST':
+        if not is_authenticated(): return jsonify({"error": "Unauthorized"}), 401
+        data = request.get_json(silent=True)
+        if not data: return jsonify({"error": "Invalid data"}), 400
+        try:
+            success = save_vibe_config(data)
+            if success:
+                return jsonify({"message": "Vibe config saved"}), 200
+            else:
+                return jsonify({"error": "Failed to save vibe config"}), 500
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+    return jsonify(load_vibe_config())
 
 @app.route('/api/reviews', methods=['GET', 'POST'])
 def handle_reviews():
