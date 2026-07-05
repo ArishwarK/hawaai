@@ -244,7 +244,7 @@ export default function Home() {
             style={{ marginTop: '20px', marginBottom: '16px' }}
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1, duration: 0.7 }}
           >
-            <div style={{ position: 'relative', maxWidth: '800px', margin: '0 auto', height: 'clamp(250px, 55vw, 450px)', borderRadius: 'clamp(16px, 4vw, 28px)', overflow: 'hidden', boxShadow: '0 16px 48px rgba(0,0,0,0.12)' }}>
+            <div style={{ position: 'relative', maxWidth: '800px', margin: '0 auto', height: 'clamp(300px, 65vw, 550px)', borderRadius: 'clamp(16px, 4vw, 28px)', overflow: 'hidden', boxShadow: '0 16px 48px rgba(0,0,0,0.12)' }}>
               {menuCategories.length > 0 && activeCategory ? (
                 <>
                   <AnimatePresence initial={false}>
@@ -419,7 +419,7 @@ export default function Home() {
             </div>
             
             {/* Tabs List */}
-            <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '16px', borderBottom: '2px solid #eee', marginBottom: '32px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', overflowX: 'auto', paddingBottom: '16px', borderBottom: '2px solid #eee', marginBottom: '32px' }}>
               {['Instagram Feed', 'Best Sellers', 'Offers'].map(tab => (
                 <button
                   key={tab}

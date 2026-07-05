@@ -547,7 +547,6 @@ export default function AdminPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: vibeActiveBlock ? '24px' : '0' }}>
               {[
                 { key: 'insta', icon: '📸', label: 'Instagram Feed', bg: '#f8f9ff', count: `${reels.length} Reels` },
-                { key: 'reviews', icon: '⭐', label: 'Customer Reviews', bg: '#fff8f0', count: 'Widget PID' },
                 { key: 'sellers', icon: '🌟', label: 'Best Sellers', bg: '#f0fff4', count: `${vibeConfig.best_sellers.length} Items` },
                 { key: 'offers', icon: '🎁', label: 'Offers', bg: '#fff0f9', count: `${vibeConfig.offers.length} Offers` }
               ].map(block => (
@@ -608,18 +607,7 @@ export default function AdminPage() {
               </div>
             )}
 
-            {/* Expanded Editor for Customer Reviews */}
-            {vibeActiveBlock === 'reviews' && (
-              <div style={{ background: '#fff8f0', borderRadius: '16px', padding: '20px', marginTop: '16px' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '12px', margin: '0 0 12px 0' }}>⭐ Customer Reviews</h3>
-                <input
-                  value={vibeConfig.reviews_pid}
-                  onChange={(e) => setVibeConfig({ ...vibeConfig, reviews_pid: e.target.value })}
-                  placeholder="Common Ninja Widget PID"
-                  style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid #eee', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box' }}
-                />
-              </div>
-            )}
+
 
             {/* Expanded Editor for Best Sellers */}
             {vibeActiveBlock === 'sellers' && (
