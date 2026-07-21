@@ -414,26 +414,28 @@ export default function Home() {
             </div>
             
             {/* Tabs List */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', overflowX: 'auto', paddingBottom: '16px', borderBottom: '2px solid #eee', marginBottom: '32px' }}>
-              {['Instagram Feed', 'Best Sellers', 'Offers'].map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveVibeTab(tab)}
-                  style={{
-                    background: activeVibeTab === tab ? 'var(--tropical-pink)' : 'transparent',
-                    color: activeVibeTab === tab ? 'white' : '#666',
-                    border: 'none',
-                    padding: '8px 24px',
-                    borderRadius: '99px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                    transition: 'all 0.3s ease'
-                  }}
-                >
-                  {tab}
-                </button>
-              ))}
+            <div style={{ display: 'flex', justifyContent: 'center', width: '100%', borderBottom: '2px solid #eee', marginBottom: '32px' }}>
+              <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '16px', maxWidth: '100%', paddingLeft: '4px', paddingRight: '4px' }}>
+                {['Instagram Feed', 'Best Sellers', 'Offers'].map(tab => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveVibeTab(tab)}
+                    style={{
+                      background: activeVibeTab === tab ? 'var(--tropical-pink)' : 'transparent',
+                      color: activeVibeTab === tab ? 'white' : '#666',
+                      border: 'none',
+                      padding: '8px 24px',
+                      borderRadius: '99px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Tab Contents */}
