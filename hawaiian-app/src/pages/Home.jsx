@@ -231,12 +231,7 @@ export default function Home() {
             Coimbatore's Home of Island-Inspired Bites, Sips & Desserts
           </motion.p>
           
-          <motion.p
-            style={{ fontSize: 'clamp(0.85rem, 2.5vw, 1.1rem)', color: '#666', fontWeight: 500, marginBottom: '16px', maxWidth: '700px', marginInline: 'auto' }}
-            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0, duration: 0.7 }}
-          >
-            Bubble Tea • Hawaiian Shaved Ice • Mochi Donuts • Burgers • Sandwiches • Bites & Dessert
-          </motion.p>
+
 
 
           {/* Explore Our Varieties - Product Slider */}
@@ -469,31 +464,32 @@ export default function Home() {
                         transition={{ delay: i * 0.1 }}
                         onClick={() => setSelectedReel(reelId)}
                         style={{
-                          minWidth: 'clamp(180px, 50vw, 240px)',
-                          width: 'clamp(180px, 50vw, 240px)',
-                          height: 'clamp(320px, 55vh, 420px)',
+                          minWidth: 'clamp(280px, 80vw, 320px)',
+                          width: 'clamp(280px, 80vw, 320px)',
+                          height: '540px',
                           scrollSnapAlign: 'center',
                           flexShrink: 0,
                           overflow: 'hidden',
                           borderRadius: '24px',
                           position: 'relative',
                           cursor: 'pointer',
-                          background: '#000',
-                          boxShadow: '0 12px 32px rgba(0,0,0,0.15)'
+                          background: '#fff',
+                          boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+                          border: '1px solid #eee'
                         }}
                       >
-                        {/* Peek Iframe (Shows the real starting image) */}
-                        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: '#000' }}>
+                        {/* Peek Iframe */}
+                        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', display: 'flex', justifyContent: 'center' }}>
                           <iframe
                             title={`peek-${i}`}
                             src={`https://www.instagram.com/reel/${reelId}/embed/?hidecaption=1`}
                             frameBorder="0"
                             scrolling="no"
                             style={{
-                              width: '100%',
-                              height: '110%', 
+                              width: '320px',
+                              height: '540px', 
                               border: 'none',
-                              transform: 'translateY(-5%)'
+                              maxWidth: 'none'
                             }}
                           />
                         </div>
@@ -504,35 +500,32 @@ export default function Home() {
                             position: 'absolute',
                             inset: 0,
                             zIndex: 2,
-                            background: 'rgba(0,0,0,0.05)',
+                            background: 'rgba(0,0,0,0)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             transition: 'background 0.3s'
                           }}
-                          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.15)'}
-                          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.05)'}
+                          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.05)'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0)'}
                         >
                           <div style={{ 
-                            width: '60px', 
-                            height: '60px', 
+                            width: '56px', 
+                            height: '56px', 
                             borderRadius: '50%', 
-                            background: 'rgba(255,255,255,0.3)', 
-                            backdropFilter: 'blur(10px)', 
+                            background: 'rgba(255,255,255,0.85)', 
+                            backdropFilter: 'blur(8px)', 
                             display: 'flex', 
                             alignItems: 'center', 
                             justifyContent: 'center', 
-                            border: '1.5px solid rgba(255,255,255,0.5)',
-                            boxShadow: '0 8px 20px rgba(0,0,0,0.2)'
+                            border: '1px solid rgba(255,255,255,0.5)',
+                            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                            color: 'var(--tropical-pink)',
+                            transition: 'all 0.3s'
                           }}>
-                            <div style={{ 
-                              width: 0, 
-                              height: 0, 
-                              borderTop: '12px solid transparent', 
-                              borderBottom: '12px solid transparent', 
-                              borderLeft: '18px solid white', 
-                              marginLeft: '6px' 
-                            }}></div>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px' }}>
+                              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
                           </div>
                         </div>
                       </motion.div>
