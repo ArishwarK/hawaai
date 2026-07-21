@@ -239,7 +239,7 @@ export default function Home() {
             style={{ marginTop: '20px', marginBottom: '16px' }}
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1, duration: 0.7 }}
           >
-            <div style={{ position: 'relative', maxWidth: '800px', margin: '0 auto', height: 'clamp(220px, 40vw, 400px)', borderRadius: 'clamp(16px, 4vw, 28px)', overflow: 'hidden', boxShadow: '0 16px 48px rgba(0,0,0,0.12)' }}>
+            <div style={{ position: 'relative', maxWidth: '800px', margin: '0 auto', height: 'clamp(260px, 50vw, 450px)', borderRadius: 'clamp(16px, 4vw, 28px)', overflow: 'hidden', boxShadow: '0 16px 48px rgba(0,0,0,0.12)' }}>
               {menuCategories.length > 0 && activeCategory ? (
                 <>
                   <AnimatePresence initial={false}>
@@ -479,7 +479,7 @@ export default function Home() {
                         }}
                       >
                         {/* Peek Iframe */}
-                        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
                           <iframe
                             title={`peek-${i}`}
                             src={`https://www.instagram.com/reel/${reelId}/embed/?hidecaption=1`}
@@ -491,7 +491,7 @@ export default function Home() {
                               border: 'none',
                               maxWidth: 'none',
                               transform: 'scale(0.8125)',
-                              transformOrigin: 'top center'
+                              transformOrigin: 'top left'
                             }}
                           />
                         </div>
