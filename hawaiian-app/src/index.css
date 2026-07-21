@@ -114,9 +114,9 @@ body {
 .hero-content { position: relative; z-index: 10; max-width: 800px; padding: 0 24px; width: 100%; }
 
 /* SECTIONS */
-.section { padding: 96px 0; }
+.section { padding: 64px 0; }
 @media (max-width: 768px) {
-  .section { padding: 60px 0; }
+  .section { padding: 40px 0; }
 }
 
 .section-title { 

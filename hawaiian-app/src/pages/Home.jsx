@@ -225,14 +225,14 @@ export default function Home() {
           </motion.h1>
 
           <motion.p
-            style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)', color: '#444', fontWeight: 600, marginBottom: '16px', maxWidth: '600px', marginInline: 'auto' }}
+            style={{ fontSize: 'clamp(1rem, 3vw, 1.25rem)', color: '#444', fontWeight: 600, marginBottom: '8px', maxWidth: '600px', marginInline: 'auto' }}
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9, duration: 0.7 }}
           >
             Coimbatore's Home of Island-Inspired Bites, Sips & Desserts
           </motion.p>
           
           <motion.p
-            style={{ fontSize: 'clamp(0.85rem, 2.5vw, 1.1rem)', color: '#666', fontWeight: 500, marginBottom: '32px', maxWidth: '700px', marginInline: 'auto' }}
+            style={{ fontSize: 'clamp(0.85rem, 2.5vw, 1.1rem)', color: '#666', fontWeight: 500, marginBottom: '16px', maxWidth: '700px', marginInline: 'auto' }}
             initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0, duration: 0.7 }}
           >
             Bubble Tea • Hawaiian Shaved Ice • Mochi Donuts • Burgers • Sandwiches • Bites & Dessert
@@ -410,7 +410,7 @@ export default function Home() {
       </section>
 
       {/* 📸 CATCH THE VIBE SECTION */}
-      <section className="section container" style={{ padding: '80px 0' }}>
+      <section className="section container" style={{ padding: '64px 0' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
           
           <div style={{ flex: 1 }}>
@@ -449,9 +449,9 @@ export default function Home() {
                     id="reels-scroll-container"
                     style={{ 
                       display: 'flex', 
-                      gap: '24px', 
+                      gap: '16px', 
                       overflowX: 'auto', 
-                      padding: '24px 0',
+                      padding: '12px',
                       scrollSnapType: 'x mandatory',
                       scrollBehavior: 'smooth',
                       scrollbarWidth: 'none',
@@ -542,13 +542,13 @@ export default function Home() {
                   {/* Navigation Arrows */}
                   <button 
                     onClick={() => document.getElementById('reels-scroll-container').scrollBy({ left: -324, behavior: 'smooth' })}
-                    style={{ position: 'absolute', left: '-20px', top: '50%', transform: 'translateY(-50%)', width: '50px', height: '50px', borderRadius: '50%', background: 'white', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
+                    style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '44px', height: '44px', borderRadius: '50%', background: 'rgba(255,255,255,0.95)', border: 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
                   >
                     <ChevronLeft size={24} color="var(--charcoal)" />
                   </button>
                   <button 
                     onClick={() => document.getElementById('reels-scroll-container').scrollBy({ left: 324, behavior: 'smooth' })}
-                    style={{ position: 'absolute', right: '-20px', top: '50%', transform: 'translateY(-50%)', width: '50px', height: '50px', borderRadius: '50%', background: 'white', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
+                    style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '44px', height: '44px', borderRadius: '50%', background: 'rgba(255,255,255,0.95)', border: 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
                   >
                     <ChevronRight size={24} color="var(--charcoal)" />
                   </button>
@@ -681,7 +681,7 @@ export default function Home() {
       </section>
 
       {/* 📍 LOCATION SECTION */}
-      <section id="visit" className="section location-sec" style={{ padding: '96px 0', background: 'var(--charcoal)', color: 'white' }}>
+      <section id="visit" className="section location-sec" style={{ padding: '64px 0', background: 'var(--charcoal)', color: 'white' }}>
         <div className="container grid-2" style={{ alignItems: 'center' }}>
           <div>
             <h2 className="section-title">Your go-to Spot for <span className="text-gradient">Refreshment</span></h2>
@@ -733,7 +733,7 @@ export default function Home() {
             </div>
           </div>
           <div className="loc-map" style={{ width: '100%', height: '400px', borderRadius: '24px', overflow: 'hidden', background: '#333' }}>
-            <iframe title="Map location" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.273155827668!2d77.02240297480877!3d11.02813768913636!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba859a72d1f4d99%3A0xc6cb5a5bce9fa73d!2sHawaii'n%20Delight!5e0!3m2!1sen!2sin!4v1711294801234!5m2!1sen!2sin" width="100%" height="100%" style={{ border: 0 }} allowFullScreen="" loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+            <iframe title="Map location" src="https://maps.google.com/maps?q=Hawaii'n%20Delight,%20JB%20Towers,%2077/1,%20Avinashi%20Rd,%20Coimbatore&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style={{ border: 0 }} allowFullScreen="" loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
           </div>
 
         </div>
